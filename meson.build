@@ -2,7 +2,7 @@
 project(
   'firefly',
   ['cpp'],
-  version : '2.0.2',
+  version : '2.0.3',
   license : 'GPL3',
   default_options : [
     'cpp_std=c++14',
