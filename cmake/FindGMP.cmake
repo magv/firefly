@@ -66,20 +66,29 @@ endmacro()
 
 # find version if asked for
 if(GMP_FIND_VERSION AND GMP_INCLUDE_DIRS)
+  # search for gmpxx.h
+  find_path(GMPXX_H_INCLUDE_DIRS
+    NAMES gmpxx.h
+    PATHS ${GMP_INCLUDE_DIRS}
+    NO_DEFAULT_PATH
+  )
+
+  if("${GMPXX_H_INCLUDE_DIRS}" STREQUAL "GMPXX_H_INCLUDE_DIRS-NOTFOUND")
+    message(FATAL_ERROR "GMP header gmpxx.h not found in provided GMP_INCLUDE_DIRS.")
+  endif()
+
   # search for gmp.h
   find_path(GMP_H_INCLUDE_DIRS
     NAMES gmp.h
-    PATHS ${GMP_INCLUDE_DIR}
-    PATH_SUFFIXES include
+    PATHS ${GMP_INCLUDE_DIRS}
+    NO_DEFAULT_PATH
   )
 
-  if(GMP_H_INCLUDE_DIRS)
-    _FF_extract_GMP_version("${GMP_H_INCLUDE_DIRS}/gmp.h")
+  if("${GMP_H_INCLUDE_DIRS}" STREQUAL "GMP_H_INCLUDE_DIRS-NOTFOUND")
+    message(FATAL_ERROR "GMP version header gmp.h not found in provided GMP_INCLUDE_DIRS.")
   else()
-    message(FATAL_ERROR "GMP version header gmp.h not found.")
+    _FF_extract_GMP_version("${GMP_INCLUDE_DIRS}/gmp.h")
   endif()
-
-MESSAGE("-- Set GMP include path to: ${GMP_INCLUDE_DIRS}")
 else()
   find_path(GMP_INCLUDE_DIRS
     NAMES gmpxx.h
@@ -93,17 +102,18 @@ else()
   )
 
   # find version if asked for
-  if(GMP_FIND_VERSION AND GMP_INCLUDE_DIRS)
+  if(GMP_FIND_VERSION)
     # search for gmp.h
     find_path(GMP_H_INCLUDE_DIRS
       NAMES gmp.h
       PATHS ${GMP_INCLUDE_DIR}
       PATH_SUFFIXES include
     )
-    if(GMP_H_INCLUDE_DIRS)
-      _FF_extract_GMP_version("${GMP_H_INCLUDE_DIRS}/gmp.h")
-    else()
+
+    if("${GMP_H_INCLUDE_DIRS}" STREQUAL "GMP_H_INCLUDE_DIRS-NOTFOUND")
       message(FATAL_ERROR "GMP version header gmp.h not found.")
+    else()
+      _FF_extract_GMP_version("${GMP_H_INCLUDE_DIRS}/gmp.h")
     endif()
   endif()
 endif()
@@ -116,5 +126,7 @@ find_package_handle_standard_args(GMP
     GMP_LIBRARIES
     GMP_INCLUDE_DIRS
 )
+
+MESSAGE("-- Set GMP include path to: ${GMP_INCLUDE_DIRS}")
 
 mark_as_advanced(GMP_INCLUDE_DIRS GMP_LIBRARIES)
