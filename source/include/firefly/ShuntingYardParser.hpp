@@ -246,7 +246,7 @@ namespace firefly {
       std::stack<FFIntTemp> nums;
 
       for (const auto& token : tokens) {
-        if (token == "+" || token == "-" || token == "*" || token == "/" || token == "^" || token == "!") {
+        if (token == "+" || token == "-" || token == "*" || token == "/" || token == "^" || token == "!" || token == "~" || token == ";") {
           // Pop two numbers
           FFIntTemp a = nums.top();
           nums.pop();
