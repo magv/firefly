@@ -365,7 +365,7 @@ namespace firefly {
   template<typename FFIntTemp>
   std::vector<FFIntTemp> ShuntingYardParser::evaluate_pre(const std::vector<FFIntTemp>& values) const noexcept {
     std::vector<FFIntTemp> res;
-    res.reserve(functions.size());
+    res.reserve(precomp_tokens.size());
     std::vector<FFIntTemp> neg_values;
     neg_values.reserve(values.size());
 
@@ -481,7 +481,7 @@ namespace firefly {
   template<typename FFIntTemp>
   std::vector<FFIntTemp> ShuntingYardParser::evaluate_pre_2(const std::vector<FFIntTemp>& values) const noexcept {
     std::vector<FFIntTemp> res;
-    res.reserve(functions.size());
+    res.reserve(precomp_tokens.size());
     std::vector<FFIntTemp> neg_values;
     neg_values.reserve(values.size());
 
