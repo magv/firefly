@@ -39,7 +39,7 @@ namespace firefly {
      *  @param file The path to the file in which the rational functions are stored
      *  @param vars A vector which specifies the variables of the functions. Each variable is allowed to be built of lower and upper case letters and numbers up to 16 characters.
      *  @param check_is_equal Sets the option to check whether parsed functions are equal to only evaluate them once
-     *  @param keep_rpn_ keeps the rpn in memory when set to true
+     *  @param keep_rpn_ keeps the rpn in memory when set to true, has to be true in order to use evaluate()
      */
     ShuntingYardParser(const std::string& file, const std::vector<std::string>& vars, bool check_is_equal = false, bool keep_rpn_ = false);
     /**
@@ -47,7 +47,7 @@ namespace firefly {
      *  @param funs A collection of functions
      *  @param vars A vector which specifies the variables of the functions. Each variable is allowed to be built of lower and upper case letters and numbers up to 16 characters.
      *  @param check_is_equal Sets the option to check whether parsed functions are equal to only evaluate them once
-     *  @param keep_rpn_ keeps the rpn in memory when set to true
+     *  @param keep_rpn_ keeps the rpn in memory when set to true, has to be true in order to use evaluate()
      */
     ShuntingYardParser(const std::vector<std::string>& funs, const std::vector<std::string>& vars, bool check_is_equal = false, bool keep_rpn_ = false);
     /**
