@@ -18,7 +18,7 @@ pkgconfig_deps = [dependency('zlib', static : get_option('static'))]
 # (with flags in the 'Cflags' field).
 other_deps = [dependency('threads', static : get_option('static'))]
 rootdir_cppdef = '-DFIREFLY_ROOT_DIR="' + meson.current_source_dir() + '"'
-rpath = ''
+rpath = join_paths(get_option('prefix'),get_option('libdir'))
 cpp_def_flint = false
 cpp_def_default = false
 cpp_def_mpi = false
@@ -67,7 +67,6 @@ if get_option('flint')
     endif
     flint_proj = subproject('flint2')
     flint_dep = flint_proj.get_variable('flint_dep')
-    rpath = join_paths(get_option('prefix'),get_option('libdir'))
   endif
   other_deps += [flint_dep]
 else
