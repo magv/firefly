@@ -1,13 +1,7 @@
 include_directories(${INCLUDE_PATH}/test)
 add_definitions(-DDOCTEST_CONFIG_IMPLEMENT_WITH_MAIN)
 
-set(LIBS FireFly_static gmp ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-if("${WITH_FLINT}" STREQUAL true)
-  set(LIBS ${LIBS} flint)
-endif()
-if("${WITH_MPI}" STREQUAL true)
-  set(LIBS ${LIBS} ${MPI_CXX_LIBRARIES})
-endif()
+set(LIBS FireFly_static ${LIBS})
 
 function(add_firefly_test name)
   if("${CUSTOM}" STREQUAL "true")
