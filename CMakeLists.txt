@@ -24,6 +24,7 @@ if(NOT WIN32)
   set(BoldWhite   "${Esc}[1;37m")
 endif()
 
+find_package(Threads REQUIRED)
 find_package(GMP 6.1.2 REQUIRED)
 find_package(ZLIB REQUIRED)
 
@@ -39,14 +40,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # enable all warnings in Debug mode
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -pthread -g")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -g")
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL Release)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -g")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 endif()
-
-set(CMAKE_SHARED_LINKER_FLAGS "-pthread")
 
 # set paths
 set(SOURCE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/source)
@@ -137,7 +136,7 @@ set_target_properties(FireFly_static PROPERTIES OUTPUT_NAME firefly)
 add_library(FireFly_shared SHARED ${LIBSOURCES})
 set_target_properties(FireFly_shared PROPERTIES OUTPUT_NAME firefly)
 
-set(LIBS ${GMP_LIBRARIES} ${ZLIB_LIBRARIES})
+set(LIBS ${GMP_LIBRARIES} ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 if("${WITH_FLINT}" STREQUAL true)
   set(LIBS ${LIBS} ${FLINT_LIBRARY})
 endif()
@@ -196,11 +195,11 @@ if("${DISABLE_INSTALL}" STREQUAL "")
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib)
 
-  set(PKG_LIBS ${LIBS} "-pthread")
+  set(PKG_LIBS ${LIBS})
   list(REMOVE_DUPLICATES PKG_LIBS)
   string(REPLACE ";" " " PKG_LIBS "${PKG_LIBS}")
 
-  set(PKG_INCLUDE ${PKG_INCLUDE} "-pthread")
+  set(PKG_INCLUDE ${PKG_INCLUDE})
   list(REMOVE_DUPLICATES PKG_INCLUDE)
   string(REPLACE ";" " " PKG_INCLUDE "${PKG_INCLUDE}")
 

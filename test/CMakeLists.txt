@@ -1,7 +1,7 @@
 include_directories(${INCLUDE_PATH}/test)
 add_definitions(-DDOCTEST_CONFIG_IMPLEMENT_WITH_MAIN)
 
-set(LIBS FireFly_static gmp ${ZLIB_LIBRARIES})
+set(LIBS FireFly_static gmp ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 if("${WITH_FLINT}" STREQUAL true)
   set(LIBS ${LIBS} flint)
 endif()
