@@ -483,8 +483,8 @@ namespace firefly {
   template<typename BlackBoxTemp>
   void Reconstructor<BlackBoxTemp>::enable_shift_scan() {
     if (n == 1) {
-      WARNING_MSG("Scan disabled for a univariate rational function.");
-      logger << "Scan disabled for a univariate rational function.\n";
+      WARNING_MSG("Shift scan disabled for a univariate rational function.");
+      logger << "Shift scan disabled for a univariate rational function.\n";
     } else {
       scan = true;
     }
