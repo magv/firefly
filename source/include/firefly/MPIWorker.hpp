@@ -414,8 +414,8 @@ namespace firefly {
         }
       }
 
-      tp.run_task([this, indices = std::move(indices), values_vec = std::move(values_vec)]() {
-        compute<N>(indices, values_vec);
+      tp.run_task([this, indices = std::move(indices), values_vec = std::move(values_vec)](uint32_t thread_id) {
+        compute<N>(indices, values_vec, thread_id);
       });
     } else {
       std::vector<FFInt> values_vec;
@@ -427,17 +427,17 @@ namespace firefly {
         values_vec.emplace_back(values_list[(n + 1) * start + j + 1]);
       }
 
-      tp.run_task([this, index, values_vec = std::move(values_vec)]() {
-        compute(index, values_vec);
+      tp.run_task([this, index, values_vec = std::move(values_vec)](uint32_t thread_id) {
+        compute(index, values_vec, thread_id);
       });
     }
   }
 
   template<typename BlackBoxTemp>
-  void MPIWorker<BlackBoxTemp>::compute(const uint64_t index, const std::vector<FFInt>& values_vec) {
+  void MPIWorker<BlackBoxTemp>::compute(const uint64_t index, const std::vector<FFInt>& values_vec, uint32_t thread_id) {
     auto time0 = std::chrono::high_resolution_clock::now();
 
-    std::vector<FFInt> result = bb.eval(values_vec);
+    std::vector<FFInt> result = bb.eval(values_vec, thread_id);
 
     auto time1 = std::chrono::high_resolution_clock::now();
 
@@ -469,10 +469,10 @@ namespace firefly {
 
   template<typename BlackBoxTemp>
   template<uint32_t N>
-  void MPIWorker<BlackBoxTemp>::compute(const std::vector<uint64_t>& index_vec, const std::vector<FFIntVec<N>>& values_vec) {
+  void MPIWorker<BlackBoxTemp>::compute(const std::vector<uint64_t>& index_vec, const std::vector<FFIntVec<N>>& values_vec, uint32_t thread_id) {
     auto time0 = std::chrono::high_resolution_clock::now();
 
-    std::vector<FFIntVec<N>> result = bb.eval(values_vec);
+    std::vector<FFIntVec<N>> result = bb.eval(values_vec, thread_id);
 
     auto time1 = std::chrono::high_resolution_clock::now();
 

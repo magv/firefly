@@ -18,6 +18,7 @@
 
 #pragma once
 #include <vector>
+#include <cstdint>
 
 namespace firefly {
   /**
@@ -32,8 +33,18 @@ namespace firefly {
      *  @param values The values to be inserted for the variables
      *  @return The result vector
      */
+    // template<typename FFTemp>
+    // std::vector<FFTemp> eval(const std::vector<FFTemp> & values) {
+    //   return static_cast<BlackBoxTemp&>(*this)(values);
+    // }
+    /**
+     *  The evaluation of the black box. This function is called from Reconstructor.
+     *  @param values The values to be inserted for the variables
+     *  @param thread id the id (index) of the thread that is running the evaluation
+     *  @return The result vector
+     */
     template<typename FFTemp>
-    std::vector<FFTemp> eval(const std::vector<FFTemp> & values) {
+    std::vector<FFTemp> eval(const std::vector<FFTemp> & values, uint32_t thread_id) {
       return static_cast<BlackBoxTemp&>(*this)(values);
     }
     /**

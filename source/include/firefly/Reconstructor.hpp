@@ -320,18 +320,18 @@ namespace firefly {
     /**
      *  Checks whether there are probes requested and starts the calculation
      */
-    void get_job();
+    void get_job(uint32_t thread_id);
     /**
      *  Computes a probe
      *  @param lock_probe_queue the locked mutex of the queue of probes
      */
-    void compute_probe(std::unique_lock<std::mutex>& lock_probe_queue);
+    void compute_probe(std::unique_lock<std::mutex>& lock_probe_queue, uint32_t thread_id);
     /**
      *  Computes N probes
      *  @param lock_probe_queue the locked mutex of the queue of probes
      */
     template<uint32_t N>
-    void compute_probe(std::unique_lock<std::mutex>& lock_probe_queue);
+    void compute_probe(std::unique_lock<std::mutex>& lock_probe_queue, uint32_t thread_id);
     /**
      *  Resets all variables when the prime changes
      */
@@ -632,7 +632,7 @@ namespace firefly {
         std::getline(validation_file, line);
         std::vector<FFInt> values = parse_vector_FFInt(line);
 
-        std::vector<FFInt> result = bb.eval(values);
+        std::vector<FFInt> result = bb.eval(values, 0);
         size_t counter = 0;
 
         for (const auto & el : parsed_factors) {
@@ -903,7 +903,7 @@ namespace firefly {
     }
 
     ThreadPool tp_comm(1);
-    tp_comm.run_priority_task([this]() {
+    tp_comm.run_priority_task([this](uint32_t thread_id) {
       {
         std::unique_lock<std::mutex> lock_probe_queue(mutex_probe_queue);
 
@@ -2051,8 +2051,8 @@ namespace firefly {
       }
 
       for (uint32_t j = 0; j != to_start; ++j) {
-        tp.run_task([this]() {
-          get_job();
+        tp.run_task([this](uint32_t thread_id) {
+          get_job(thread_id);
         });
       }
     }
@@ -2295,8 +2295,8 @@ namespace firefly {
     }
 
     for (uint32_t j = 0; j != to_start; ++j) {
-      tp.run_task([this]() {
-        get_job();
+      tp.run_task([this](uint32_t thread_id) {
+        get_job(thread_id);
       });
     }
 #endif
@@ -2334,7 +2334,7 @@ namespace firefly {
           if (std::get<2>(rec)->get_prime() == 0) {
             ++counter;
 
-            tp.run_priority_task([this, &rec]() {
+            tp.run_priority_task([this, &rec](uint32_t thread_id) {
               interpolate_job(rec);
             });
           }
@@ -2693,8 +2693,8 @@ namespace firefly {
           }
 
           for (uint32_t j = 0; j != to_start; ++j) {
-            tp.run_task([this]() {
-              get_job();
+            tp.run_task([this](uint32_t thread_id) {
+              get_job(thread_id);
             });
           }
         }
@@ -2720,7 +2720,7 @@ namespace firefly {
         ++feed_jobs;
       }
 
-      tp.run_priority_task([this, indices = std::move(indices), probes = std::move(probes)]() {
+      tp.run_priority_task([this, indices = std::move(indices), probes = std::move(probes)](uint32_t thread_id) {
         feed_job(indices, probes);
       });
 
@@ -2978,8 +2978,8 @@ namespace firefly {
 #endif
     if (!precomputed_probes) {
       for (uint32_t j = 0; j != to_start; ++j) {
-        tp.run_task([this]() {
-          get_job();
+        tp.run_task([this](uint32_t thread_id) {
+          get_job(thread_id);
         });
       }
     }
@@ -3067,13 +3067,13 @@ namespace firefly {
             if (interpolate_and_write.first) {
               ++counter;
 
-              tp.run_priority_task([this, &rec]() {
+              tp.run_priority_task([this, &rec](uint32_t thread_id) {
                 interpolate_job(rec);
               });
             }
 
             if (interpolate_and_write.second) {
-              tp.run_priority_task([&rec]() {
+              tp.run_priority_task([&rec](uint32_t thread_id) {
                 std::get<2>(rec)->write_food_to_file();
               });
             }
@@ -3323,34 +3323,34 @@ namespace firefly {
   }
 
   template<typename BlackBoxTemp>
-  void Reconstructor<BlackBoxTemp>::get_job() {
+  void Reconstructor<BlackBoxTemp>::get_job(uint32_t thread_id) {
     std::unique_lock<std::mutex> lock_probe_queue(mutex_probe_queue);
 
     if (!requested_probes.empty()) {
       switch(compute_bunch_size(static_cast<uint32_t>(requested_probes.size()), thr_n, bunch_size)) {
         case 1:
-          compute_probe(lock_probe_queue);
+          compute_probe(lock_probe_queue, thread_id);
           break;
         case 2:
-          compute_probe<2>(lock_probe_queue);
+          compute_probe<2>(lock_probe_queue, thread_id);
           break;
         case 4:
-          compute_probe<4>(lock_probe_queue);
+          compute_probe<4>(lock_probe_queue, thread_id);
           break;
         case 8:
-          compute_probe<8>(lock_probe_queue);
+          compute_probe<8>(lock_probe_queue, thread_id);
           break;
         case 16:
-          compute_probe<16>(lock_probe_queue);
+          compute_probe<16>(lock_probe_queue, thread_id);
           break;
         case 32:
-          compute_probe<32>(lock_probe_queue);
+          compute_probe<32>(lock_probe_queue, thread_id);
           break;
         case 64:
-          compute_probe<64>(lock_probe_queue);
+          compute_probe<64>(lock_probe_queue, thread_id);
           break;
         case 128:
-          compute_probe<128>(lock_probe_queue);
+          compute_probe<128>(lock_probe_queue, thread_id);
           break;
 /*        case 256:
           compute_probe<256>(lock_probe_queue);
@@ -3366,7 +3366,7 @@ namespace firefly {
   }
 
   template<typename BlackBoxTemp>
-  void Reconstructor<BlackBoxTemp>::compute_probe(std::unique_lock<std::mutex>& lock_probe_queue) {
+  void Reconstructor<BlackBoxTemp>::compute_probe(std::unique_lock<std::mutex>& lock_probe_queue, uint32_t thread_id) {
     std::vector<uint64_t> indices;
     indices.reserve(1);
 
@@ -3380,7 +3380,7 @@ namespace firefly {
 
     auto time0 = std::chrono::high_resolution_clock::now();
 
-    std::vector<FFInt> probe = bb.eval(values_vec);//todo if for user-defined probes
+    std::vector<FFInt> probe = bb.eval(values_vec, thread_id);//todo if for user-defined probes
 
     auto time1 = std::chrono::high_resolution_clock::now();
 
@@ -3417,7 +3417,7 @@ namespace firefly {
 
   template<typename BlackBoxTemp>
   template<uint32_t N>
-  void Reconstructor<BlackBoxTemp>::compute_probe(std::unique_lock<std::mutex>& lock_probe_queue) {
+  void Reconstructor<BlackBoxTemp>::compute_probe(std::unique_lock<std::mutex>& lock_probe_queue, uint32_t thread_id) {
     std::vector<uint64_t> indices;
     indices.reserve(N);
 
@@ -3437,7 +3437,7 @@ namespace firefly {
 
     auto time0 = std::chrono::high_resolution_clock::now();
 
-    std::vector<FFIntVec<N>> probe = bb.eval(values_vec);
+    std::vector<FFIntVec<N>> probe = bb.eval(values_vec, thread_id);
 
     auto time1 = std::chrono::high_resolution_clock::now();
 

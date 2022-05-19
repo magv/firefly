@@ -57,7 +57,7 @@ namespace firefly {
         threads.emplace_back(
         [this, i]() {
           for (;;) {
-            std::function<void()> task;
+            std::function<void(uint32_t thread_number)> task;
 
             {
               std::unique_lock<std::mutex> lock(mutex);
@@ -73,7 +73,7 @@ namespace firefly {
               tasks.pop_front();
             }
 
-            task();
+            task(i);
           }
         });
       }
@@ -106,16 +106,16 @@ namespace firefly {
     auto run_packaged_task(Task && task) -> std::future<decltype(task())> {
       using return_t = decltype(task());
 
-      auto ptask = std::make_shared<std::packaged_task<return_t()>>([task]() { return task(); });
+      auto ptask = std::make_shared<std::packaged_task<return_t()>>([task](uint32_t thread_id) { return task(thread_id); });
 
       std::future<return_t> fut = ptask->get_future();
 
       if (threads.empty()) {
-        (*ptask)();
+        (*ptask)(0);
       } else {
         {
           std::lock_guard<std::mutex> lock(mutex);
-          tasks.emplace_back([ptask]() { (*ptask)(); });
+          tasks.emplace_back([ptask](uint32_t thread_id) { (*ptask)(thread_id); });
         }
         condition.notify_one();
       }
@@ -127,16 +127,16 @@ namespace firefly {
     auto run_priority_packaged_task(Task && task) -> std::future<decltype(task())> {
       using return_t = decltype(task());
 
-      auto ptask = std::make_shared<std::packaged_task<return_t()>>([task]() { return task(); });
+      auto ptask = std::make_shared<std::packaged_task<return_t()>>([task](uint32_t thread_id) { return task(thread_id); });
 
       std::future<return_t> fut = ptask->get_future();
 
       if (threads.empty()) {
-        (*ptask)();
+        (*ptask)(0);
       } else {
         {
           std::lock_guard<std::mutex> lock(mutex);
-          tasks.emplace_front([ptask]() { (*ptask)(); });
+          tasks.emplace_front([ptask](uint32_t thread_id) { (*ptask)(thread_id); });
         }
         condition.notify_one();
       }
@@ -148,7 +148,7 @@ namespace firefly {
     template <typename Task>
     void run_task(Task && task) {
       if (threads.empty()) {
-        task();
+        task(0);
       } else {
         {
           std::lock_guard<std::mutex> lock(mutex);
@@ -161,7 +161,7 @@ namespace firefly {
     template <typename Task>
     void run_priority_task(Task && task) {
       if (threads.empty()) {
-        task();
+        task(0);
       } else {
         {
           std::lock_guard<std::mutex> lock(mutex);
@@ -190,20 +190,20 @@ namespace firefly {
     void kill_all() {
       std::unique_lock<std::mutex> lock(mutex);
 
-      tasks = std::deque<std::function<void()>>();
+      tasks = std::deque<std::function<void(uint32_t)>>();
 
       while (!all_threads_idle()) {
-        tasks = std::deque<std::function<void()>>();
+        tasks = std::deque<std::function<void(uint32_t)>>();
 
         condition_wait.wait(lock);
       }
 
-      tasks = std::deque<std::function<void()>>();
+      tasks = std::deque<std::function<void(uint32_t)>>();
     }
 
   private:
     std::vector<std::thread> threads {};
-    std::deque<std::function<void()>> tasks {};
+    std::deque<std::function<void(uint32_t)>> tasks {};
     std::mutex mutex {};
     std::condition_variable condition {};
     bool stop {false};
