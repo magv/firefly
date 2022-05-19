@@ -45,7 +45,7 @@ namespace firefly {
      */
     template<typename FFTemp>
     std::vector<FFTemp> eval(const std::vector<FFTemp> & values, uint32_t thread_id) {
-      return static_cast<BlackBoxTemp&>(*this)(values);
+      return static_cast<BlackBoxTemp&>(*this)(values, thread_id);
     }
     /**
      *  Update internal variables of the black box when the prime field changes.

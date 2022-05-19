@@ -34,7 +34,7 @@ namespace firefly {
     // In this example we compute functions which are parsed from a file with a
     // ShuntingYardParser object and the determinant of a matrix.
     template<typename FFIntTemp>
-    std::vector<FFIntTemp> operator()(const std::vector<FFIntTemp>& values) {
+    std::vector<FFIntTemp> operator()(const std::vector<FFIntTemp>& values, uint32_t thread_id) {
       //std::vector<FFIntTemp> result;
 
       // Get results from parsed expressions

@@ -32,7 +32,7 @@ namespace firefly {
     BlackBoxUser(const ShuntingYardParser& par_, int mode_) : par(par_), mode(mode_) {};
 
     template<typename FFIntTemp>
-    std::vector<FFIntTemp> operator()(const std::vector<FFIntTemp>& values) {
+    std::vector<FFIntTemp> operator()(const std::vector<FFIntTemp>& values, uint32_t thread_id) {
       //std::vector<FFInt> result;
 
       // Get results from parsed expressions

@@ -37,7 +37,7 @@ namespace firefly {
     BlackBoxFireFly() {};
 
     template<typename FFIntTemp>
-    std::vector<FFIntTemp> operator()(const std::vector<FFIntTemp>& values) {
+    std::vector<FFIntTemp> operator()(const std::vector<FFIntTemp>& values, uint32_t thread_id) {
       std::vector<FFIntTemp> result;
       return result;
     }
