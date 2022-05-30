@@ -33,6 +33,8 @@ namespace firefly {
 
     template<typename FFIntTemp>
     std::vector<FFIntTemp> operator()(const std::vector<FFIntTemp>& values, uint32_t thread_id) {
+      (void)thread_id;
+
       //std::vector<FFInt> result;
 
       // Get results from parsed expressions
