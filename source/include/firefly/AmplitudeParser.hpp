@@ -52,6 +52,7 @@ namespace firefly {
 
     template<typename FFIntTemp>
     std::vector<FFIntTemp> operator()(const std::vector<FFIntTemp>& values, uint32_t thread_id) {
+      (void)thread_id;
       return par.evaluate_pre(values);
     }
 

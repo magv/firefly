@@ -2335,6 +2335,7 @@ namespace firefly {
             ++counter;
 
             tp.run_priority_task([this, &rec](uint32_t thread_id) {
+              (void)thread_id;
               interpolate_job(rec);
             });
           }
@@ -2721,6 +2722,7 @@ namespace firefly {
       }
 
       tp.run_priority_task([this, indices = std::move(indices), probes = std::move(probes)](uint32_t thread_id) {
+        (void)thread_id;
         feed_job(indices, probes);
       });
 
@@ -3068,12 +3070,14 @@ namespace firefly {
               ++counter;
 
               tp.run_priority_task([this, &rec](uint32_t thread_id) {
+                (void)thread_id;
                 interpolate_job(rec);
               });
             }
 
             if (interpolate_and_write.second) {
               tp.run_priority_task([&rec](uint32_t thread_id) {
+                (void)thread_id;
                 std::get<2>(rec)->write_food_to_file();
               });
             }

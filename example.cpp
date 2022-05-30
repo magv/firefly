@@ -35,6 +35,8 @@ namespace firefly {
     // ShuntingYardParser object and the determinant of a matrix.
     template<typename FFIntTemp>
     std::vector<FFIntTemp> operator()(const std::vector<FFIntTemp>& values, uint32_t thread_id) {
+      (void)thread_id;
+
       //std::vector<FFIntTemp> result;
 
       // Get results from parsed expressions
