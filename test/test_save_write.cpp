@@ -224,7 +224,7 @@ int main() {
     std::remove("ff_save/shift");
     std::remove("ff_save/anchor_points");
     INFO_MSG("Starting from saved states passed");
-    std::cout << "\n";
+    std::cerr << "\n";
   }
 
   // Remove files

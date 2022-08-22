@@ -399,7 +399,7 @@ namespace firefly {
 
     if (verbosity > SILENT) {
       if(!printed_logo) {
-        std::cout << "\nFire\033[1;32mFly\033[0m " << FireFly_VERSION_MAJOR << "."
+        std::cerr << "\nFire\033[1;32mFly\033[0m " << FireFly_VERSION_MAJOR << "."
                   << FireFly_VERSION_MINOR << "." << FireFly_VERSION_RELEASE << "\n\n";
         printed_logo = true;
       }
@@ -441,7 +441,7 @@ namespace firefly {
 
     if (verbosity > SILENT) {
             if(!printed_logo) {
-        std::cout << "\nFire\033[1;32mFly\033[0m " << FireFly_VERSION_MAJOR << "."
+        std::cerr << "\nFire\033[1;32mFly\033[0m " << FireFly_VERSION_MAJOR << "."
                   << FireFly_VERSION_MINOR << "." << FireFly_VERSION_RELEASE << "\n\n";
         printed_logo = true;
       }
@@ -924,7 +924,7 @@ namespace firefly {
       logger << "\n" << "Promote to new prime field: F(" << std::to_string(primes()[prime_it]) << ")\n";
 
       if (verbosity > SILENT) {
-        std::cout << "\n";
+        std::cerr << "\n";
         INFO_MSG("Promote to new prime field: F(" + std::to_string(primes()[prime_it]) + ")");
       }
 
