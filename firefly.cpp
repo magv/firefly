@@ -38,6 +38,7 @@ namespace firefly {
 
     template<typename FFIntTemp>
     std::vector<FFIntTemp> operator()(const std::vector<FFIntTemp>& values) {
+      (void)values;
       std::vector<FFIntTemp> result;
       return result;
     }
