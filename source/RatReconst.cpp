@@ -40,7 +40,7 @@ namespace firefly {
 
     std::unique_lock<std::mutex> lock_status(mutex_status);
 
-    combined_prime = mpz_class(std::to_string(FFInt::p));
+    combined_prime = fmpzxx(FFInt::p);
 
     {
       std::lock_guard<std::mutex> lock_statics(mutex_statics);
@@ -145,7 +145,7 @@ namespace firefly {
           fed_zero = true;
 
           if (zero_counter == prime_number + 1)
-            combined_prime = mpz_class(std::to_string(primes()[prime_number + 1]));
+            combined_prime = fmpzxx(primes()[prime_number + 1]);
 
           if (tag.size() != 0) {
             if (prime_number != 0)
@@ -226,7 +226,7 @@ namespace firefly {
           fed_zero = true;
 
           if (zero_counter == prime_number + 1)
-            combined_prime = mpz_class(std::to_string(primes()[prime_number + 1]));
+            combined_prime = fmpzxx(primes()[prime_number + 1]);
 
           if (tag.size() != 0) {
             if (prime_number != 0)
@@ -1395,7 +1395,7 @@ namespace firefly {
 
     if (!div_by_zero) {
       if (!use_chinese_remainder) {
-        combined_prime = mpz_class(std::to_string(FFInt::p));
+        combined_prime = fmpzxx(FFInt::p);
         combined_ni = convert_to_mpz(numerator);
         combined_di = convert_to_mpz(denominator);
 
@@ -1449,28 +1449,28 @@ namespace firefly {
           }
         }
 
-        mpz_class combined_prime_back = combined_prime;
+        fmpzxx combined_prime_back = combined_prime;
         mpz_map combined_prime_ni_back = combined_primes_ni;
         mpz_map combined_prime_di_back = combined_primes_di;
-        std::pair<mpz_class, mpz_class> p1;
-        std::pair<mpz_class, mpz_class> p2;
-        std::pair<mpz_class, mpz_class> p3;
+        std::pair<fmpzxx, fmpzxx> p1;
+        std::pair<fmpzxx, fmpzxx> p2;
+        std::pair<fmpzxx, fmpzxx> p3;
 
         //numerator
         for (auto it = combined_ni.begin(); it != combined_ni.end(); ++it) {
           if (!is_safe_mode) {
             p1 = std::make_pair(it->second, combined_prime);
-            p2 = std::make_pair(mpz_class(std::to_string(numerator[it->first].n)), mpz_class(std::to_string(FFInt::p)));
+            p2 = std::make_pair(fmpzxx(numerator[it->first].n), fmpzxx(FFInt::p));
             p3 = run_chinese_remainder(p1, p2);
             combined_ni[it->first] = p3.first;
           } else {
             if (numerator.find(it->first) != numerator.end() && g_ni.find(it->first) == g_ni.end()) {
               if (combined_ni[it->first] == 0) {
-                combined_ni[it->first] = mpz_class(std::to_string(numerator[it->first].n));
-                combined_primes_ni[it->first] = mpz_class(std::to_string(FFInt::p));
+                combined_ni[it->first] = fmpzxx(numerator[it->first].n);
+                combined_primes_ni[it->first] = fmpzxx(FFInt::p);
               } else {
                 p1 = std::make_pair(it->second, combined_primes_ni[it->first]);
-                p2 = std::make_pair(mpz_class(std::to_string(numerator[it->first].n)), mpz_class(std::to_string(FFInt::p)));
+                p2 = std::make_pair(fmpzxx(numerator[it->first].n), fmpzxx(FFInt::p));
                 p3 = run_chinese_remainder(p1, p2);
                 combined_ni[it->first] = p3.first;
                 combined_primes_ni[it->first] = p3.second;
@@ -1483,17 +1483,17 @@ namespace firefly {
         for (auto it = combined_di.begin(); it != combined_di.end(); ++it) {
           if (!is_safe_mode) {
             p1 = std::make_pair(it->second, combined_prime);
-            p2 = std::make_pair(mpz_class(std::to_string(denominator[it->first].n)), mpz_class(std::to_string(FFInt::p)));
+            p2 = std::make_pair(fmpzxx(denominator[it->first].n), fmpzxx(FFInt::p));
             p3 = run_chinese_remainder(p1, p2);
             combined_di[it->first] = p3.first;
           } else {
             if (denominator.find(it->first) != denominator.end() && g_di.find(it->first) == g_di.end()) {
               if (combined_di[it->first] == 0) {
-                combined_di[it->first] = mpz_class(std::to_string(denominator[it->first].n));
-                combined_primes_di[it->first] = mpz_class(std::to_string(FFInt::p));
+                combined_di[it->first] = fmpzxx(denominator[it->first].n);
+                combined_primes_di[it->first] = fmpzxx(FFInt::p);
               } else {
                 p1 = std::make_pair(it->second, combined_primes_di[it->first]);
-                p2 = std::make_pair(mpz_class(std::to_string(denominator[it->first].n)), mpz_class(std::to_string(FFInt::p)));
+                p2 = std::make_pair(fmpzxx(denominator[it->first].n), fmpzxx(FFInt::p));
                 p3 = run_chinese_remainder(p1, p2);
                 combined_di[it->first] = p3.first;
                 combined_primes_di[it->first] = p3.second;
@@ -1578,7 +1578,7 @@ namespace firefly {
             }
 
             if (!is_safe_mode && c_ni.second == combined_ni[c_ni.first]) {
-              RationalNumber rn = RationalNumber(c_ni.second, 1);
+              RationalNumber rn = RationalNumber(c_ni.second, fmpzxx(1));
               remove_ni(c_ni.first, rn);
             } else
               add_non_solved_num(c_ni.first);
@@ -1658,7 +1658,7 @@ namespace firefly {
             }
 
             if (!is_safe_mode && c_di.second == combined_di[c_di.first]) {
-              RationalNumber rn = RationalNumber(c_di.second, 1);
+              RationalNumber rn = RationalNumber(c_di.second, fmpzxx(1));
               remove_di(c_di.first, rn);
             } else
               add_non_solved_den(c_di.first);
@@ -1946,7 +1946,7 @@ namespace firefly {
     std::vector<const std::vector<uint32_t>*> promoted_d;
 
     for (const auto & ci : combined_ni) {
-      mpz_class a = ci.second;
+      fmpzxx a = ci.second;
       auto res = get_rational_coef(a, combined_prime);
 
       if (res.first) {
@@ -1967,7 +1967,7 @@ namespace firefly {
 
     if (run_test) {
       for (const auto & ci : combined_di) {
-        mpz_class a = ci.second;
+        fmpzxx a = ci.second;
         auto res = get_rational_coef(a, combined_prime);
 
         if (res.first) {
@@ -2530,7 +2530,7 @@ namespace firefly {
     ogzstream file;
     std::string file_name = "ff_save/tmp/" + tag + "_" + std::to_string(prime_number) + ".gz";
     file.open(file_name.c_str());
-    file << "combined_prime\n" << combined_prime.get_str() << "\n";
+    file << "combined_prime\n" << combined_prime.to_string() << "\n";
     file << "tag_name\n" << tag_name << "\n";
     file << "is_done\n" << is_done() << "\n";
     file << "max_deg_num\n" << max_deg_num << "\n";
@@ -2648,7 +2648,7 @@ namespace firefly {
         file << el.first[i] << " " ;
       }
 
-      file << el.second.numerator.get_str() << " " << el.second.denominator.get_str() << "\n";
+      file << el.second.numerator.to_string() << " " << el.second.denominator.to_string() << "\n";
     }
 
     file << "g_di\n";
@@ -2658,7 +2658,7 @@ namespace firefly {
         file << el.first[i] << " ";
       }
 
-      file << el.second.numerator.get_str() << " " << el.second.denominator.get_str() << "\n";
+      file << el.second.numerator.to_string() << " " << el.second.denominator.to_string() << "\n";
     }
 
     file << "combined_ni\n";
@@ -2668,7 +2668,7 @@ namespace firefly {
         file << el.first[i] << " ";
       }
 
-      file << el.second.get_str() << "\n";
+      file << el.second.to_string() << "\n";
     }
 
     file << "combined_di\n";
@@ -2678,7 +2678,7 @@ namespace firefly {
         file << el.first[i] << " ";
       }
 
-      file << el.second.get_str() << "\n";
+      file << el.second.to_string() << "\n";
     }
 
     file << "combined_primes_ni\n";
@@ -2688,7 +2688,7 @@ namespace firefly {
         file << el.first[i] << " ";
       }
 
-      file << el.second.get_str() << "\n";
+      file << el.second.to_string() << "\n";
     }
 
     file << "combined_primes_di\n";
@@ -2698,7 +2698,7 @@ namespace firefly {
         file << el.first[i] << " ";
       }
 
-      file << el.second.get_str() << "\n";
+      file << el.second.to_string() << "\n";
     }
 
     file << "interpolations\n" << interpolations << "\n";
@@ -2876,7 +2876,7 @@ namespace firefly {
             switch (curr_parsed_variable) {
               case COMBINED_PRIME: {
                 std::lock_guard<std::mutex> lock_status(mutex_status);
-                combined_prime = mpz_class(line);
+                combined_prime = fmpzxx(line.c_str());
                 break;
               }
 
@@ -3045,7 +3045,7 @@ namespace firefly {
                 }
 
                 std::vector<uint32_t> tmp_vec = parse_vector_32(line, n);
-                combined_ni.emplace(std::make_pair(tmp_vec, mpz_class(line)));
+                combined_ni.emplace(std::make_pair(tmp_vec, fmpzxx(line.c_str())));
 
                 break;
               }
@@ -3057,7 +3057,7 @@ namespace firefly {
                 }
 
                 std::vector<uint32_t> tmp_vec = parse_vector_32(line, n);
-                combined_di.emplace(std::make_pair(tmp_vec, mpz_class(line)));
+                combined_di.emplace(std::make_pair(tmp_vec, fmpzxx(line.c_str())));
 
                 break;
               }
@@ -3069,7 +3069,7 @@ namespace firefly {
                 }
 
                 std::vector<uint32_t> tmp_vec = parse_vector_32(line, n);
-                combined_primes_ni.emplace(std::make_pair(tmp_vec, mpz_class(line)));
+                combined_primes_ni.emplace(std::make_pair(tmp_vec, fmpzxx(line.c_str())));
 
                 break;
               }
@@ -3081,7 +3081,7 @@ namespace firefly {
                 }
 
                 std::vector<uint32_t> tmp_vec = parse_vector_32(line, n);
-                combined_primes_di.emplace(std::make_pair(tmp_vec, mpz_class(line)));
+                combined_primes_di.emplace(std::make_pair(tmp_vec, fmpzxx(line.c_str())));
 
                 break;
               }

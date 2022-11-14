@@ -39,6 +39,7 @@
 #include <chrono>
 #include <numeric>
 #include <tuple>
+#include <algorithm>
 #include <sys/stat.h>
 
 namespace firefly {
@@ -266,9 +267,9 @@ namespace firefly {
      *  @param combined_prime previously used combined prime
      *  @return the combined prime
      */
-    mpz_class combine_primes(const std::unordered_map<uint32_t, uint64_t>& poly,
-                             std::unordered_map<uint32_t, mpz_class>& combined_ci,
-                             const mpz_class& combined_prime);
+    fmpzxx combine_primes(const std::unordered_map<uint32_t, uint64_t>& poly,
+                          std::unordered_map<uint32_t, fmpzxx>& combined_ci,
+                          const fmpzxx& combined_prime);
     /**
      *  Initializes vector of reconstruction objects and starts first probes
      *  @param first bool to indicate whether this functions is called for the first time
@@ -1361,10 +1362,10 @@ namespace firefly {
 
     // Scan in all variables
     for (size_t i = 0; i != n; ++i) {
-      std::unordered_map<uint32_t, std::unordered_map<uint32_t, mpz_class>> combined_ni {};
-      std::unordered_map<uint32_t, std::unordered_map<uint32_t, mpz_class>> combined_di {};
+      std::unordered_map<uint32_t, std::unordered_map<uint32_t, fmpzxx>> combined_ni {};
+      std::unordered_map<uint32_t, std::unordered_map<uint32_t, fmpzxx>> combined_di {};
       std::unordered_map<uint32_t, std::pair<uint32_t, uint32_t>> max_deg_map {};
-      mpz_class combined_prime = mpz_class(std::to_string(FFInt::p));
+      fmpzxx combined_prime = fmpzxx(FFInt::p);
       bool fac_done = false;
       curr_var = "x" + std::to_string(i + 1);
       possible_factors_bb_counter.clear();
@@ -1373,7 +1374,7 @@ namespace firefly {
 
       while (!fac_done) {
         std::unordered_map<uint32_t,std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>>> possible_factors {};
-        mpz_class tmp_combined_prime = combined_prime;
+        fmpzxx tmp_combined_prime = combined_prime;
 
         for (int scan_n = 0; scan_n != 2; ++scan_n) {
           number_of_factors = 0;
@@ -1496,17 +1497,17 @@ namespace firefly {
 
                 if (prime_it_fac == 0) {
                   // Init first combinations
-                  std::unordered_map<uint32_t, mpz_class> tmp_combined_ni {};
-                  std::unordered_map<uint32_t, mpz_class> tmp_combined_di {};
+                  std::unordered_map<uint32_t, fmpzxx> tmp_combined_ni {};
+                  std::unordered_map<uint32_t, fmpzxx> tmp_combined_di {};
                   uint32_t fac_max_deg_num = 0, fac_max_deg_den = 0;
 
                   for (const auto& mon : canonical_factors.first) {
-                    tmp_combined_ni.emplace(std::make_pair(mon.first, mpz_class(std::to_string(mon.second))));
+                    tmp_combined_ni.emplace(std::make_pair(mon.first, fmpzxx(mon.second)));
                     fac_max_deg_num = std::max(fac_max_deg_num, mon.first);
                   }
 
                   for (const auto& mon : canonical_factors.second) {
-                    tmp_combined_di.emplace(std::make_pair(mon.first, mpz_class(std::to_string(mon.second))));
+                    tmp_combined_di.emplace(std::make_pair(mon.first, fmpzxx(mon.second)));
                     fac_max_deg_den = std::max(fac_max_deg_den, mon.first);
                   }
 
@@ -1526,7 +1527,7 @@ namespace firefly {
 
                   // Reconstruct numerator
                   for (const auto& ci : combined_ni[counter]) {
-                    mpz_class a = ci.second;
+                    fmpzxx a = ci.second;
                     auto res = get_rational_coef(a, combined_prime);
 
                     if (res.first) {
@@ -1540,7 +1541,7 @@ namespace firefly {
                   // Reconstruct denominator
                   if (run_test) {
                     for (const auto& ci : combined_di[counter]) {
-                      mpz_class a = ci.second;
+                      fmpzxx a = ci.second;
                       auto res = get_rational_coef(a, combined_prime);
 
                       if (res.first) {
@@ -1807,14 +1808,14 @@ namespace firefly {
 
           for (const auto& el : tmp_rf.numerator.coefs) {
             file << el.powers[0] << " ";
-            file << el.coef.numerator.get_str() << " " << el.coef.denominator.get_str() << "\n";
+            file << el.coef.numerator.to_string() << " " << el.coef.denominator.to_string() << "\n";
           }
 
           file << "denominator\n";
 
           for (const auto& el : tmp_rf.denominator.coefs) {
             file << el.powers[0] << " ";
-            file << el.coef.numerator.get_str() << " " << el.coef.denominator.get_str() << "\n";
+            file << el.coef.numerator.to_string() << " " << el.coef.denominator.to_string() << "\n";
           }
         }
 
@@ -1955,21 +1956,21 @@ namespace firefly {
   }
 
   template<typename BlackBoxTemp>
-  mpz_class Reconstructor<BlackBoxTemp>::combine_primes(const std::unordered_map<uint32_t, uint64_t>& poly,
-                                                        std::unordered_map<uint32_t, mpz_class>& combined_ci,
-                                                        const mpz_class& combined_prime) {
-    std::pair<mpz_class, mpz_class> p1;
-    std::pair<mpz_class, mpz_class> p2;
-    std::pair<mpz_class, mpz_class> p3;
-    std::unordered_map<uint32_t, mpz_class> tmp_coefs {};
+  fmpzxx Reconstructor<BlackBoxTemp>::combine_primes(const std::unordered_map<uint32_t, uint64_t>& poly,
+                                                        std::unordered_map<uint32_t, fmpzxx>& combined_ci,
+                                                        const fmpzxx& combined_prime) {
+    std::pair<fmpzxx, fmpzxx> p1;
+    std::pair<fmpzxx, fmpzxx> p2;
+    std::pair<fmpzxx, fmpzxx> p3;
+    std::unordered_map<uint32_t, fmpzxx> tmp_coefs {};
 
     // Convert poly to mpz
     for (const auto& mon : poly) {
-      tmp_coefs.emplace(std::make_pair(mon.first, mpz_class(std::to_string(mon.second))));
+      tmp_coefs.emplace(std::make_pair(mon.first, fmpzxx(mon.second)));
     }
 
     for (auto it = tmp_coefs.begin(); it != tmp_coefs.end(); ++it) {
-      p2 = std::make_pair(it->second, mpz_class(std::to_string(FFInt::p)));
+      p2 = std::make_pair(it->second, fmpzxx(FFInt::p));
       p1 = std::make_pair(combined_ci[it->first], combined_prime);
       p3 = run_chinese_remainder(p1, p2);
       combined_ci[it->first] = p3.first;

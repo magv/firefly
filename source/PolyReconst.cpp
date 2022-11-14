@@ -22,6 +22,8 @@
 #include "firefly/ReconstHelper.hpp"
 #include "firefly/utils.hpp"
 
+#include <algorithm>
+
 namespace firefly {
   // TODO for new prime just use Vandermonde matrices to solve interpolation problem
 
@@ -35,7 +37,7 @@ namespace firefly {
     type = POLY;
     n = n_;
     zero_element = std::vector<uint32_t>(n);
-    combined_prime = mpz_class(std::to_string(FFInt::p));
+    combined_prime = fmpzxx(FFInt::p);
     curr_zi_order = std::vector<uint32_t>(n, 1);
 
     deg = deg_inp;
@@ -119,7 +121,7 @@ namespace firefly {
           ais.emplace(std::make_pair(std::vector<uint32_t> (n), std::vector<FFInt> ()));
 
           for (const auto & ci : combined_ci) {
-            mpz_class a = ci.second;
+            auto a = ci.second;
 
             auto res = get_rational_coef(a, combined_prime);
 
@@ -138,7 +140,7 @@ namespace firefly {
             }
 
             if (done) {
-              combined_prime = mpz_class(0);
+              combined_prime = fmpzxx(0);
               combined_ci.clear();
               max_deg.clear();
               use_chinese_remainder = false;
@@ -481,9 +483,9 @@ namespace firefly {
                 // use another prime to utilize the Chinese Remainder Theorem to reconstruct the rational
                 // coefficients
 
-                std::pair<mpz_class, mpz_class> p1;
-                std::pair<mpz_class, mpz_class> p2;
-                std::pair<mpz_class, mpz_class> p3;
+                std::pair<fmpzxx, fmpzxx> p1;
+                std::pair<fmpzxx, fmpzxx> p2;
+                std::pair<fmpzxx, fmpzxx> p3;
 
                 for (const auto & el : combined_ci) {
                   if (ci_tmp.find(el.first) == ci_tmp.end() && gi.find(el.first) == gi.end()) {
@@ -492,13 +494,13 @@ namespace firefly {
                 }
 
                 for (auto it = ci_tmp.begin(); it != ci_tmp.end(); ++it) {
-                  p2 = std::make_pair(mpz_class(it->second), mpz_class(std::to_string(FFInt::p)));
+                  p2 = std::make_pair(fmpzxx(it->second), fmpzxx(FFInt::p));
 
                   if (combined_ci.find(it->first) == combined_ci.end() && gi.find(it->first) == gi.end()) {
                     combined_ci.emplace(std::make_pair(it->first, 0));
                   }
 
-                  p1 = std::make_pair(mpz_class(combined_ci[it->first]), combined_prime);
+                  p1 = std::make_pair(fmpzxx(combined_ci[it->first]), combined_prime);
                   p3 = run_chinese_remainder(p1, p2);
                   combined_ci[it->first] = p3.first;
                 }

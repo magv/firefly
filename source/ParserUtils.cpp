@@ -20,6 +20,8 @@
 #include "firefly/ParserUtils.hpp"
 #include "firefly/tinydir.h"
 
+#include <algorithm>
+
 namespace firefly {
   std::vector<uint32_t> parse_vector_32(std::string& line, int number_of_parameters) {
     size_t pos = 0;
@@ -63,7 +65,7 @@ namespace firefly {
 
   RationalNumber parse_rational_number(const std::string& line) {
     size_t pos = line.find(" ");
-    return RationalNumber(mpz_class(line.substr(0, pos)), mpz_class(line.substr(pos + 1)));
+    return RationalNumber(fmpzxx(line.substr(0, pos).c_str()), fmpzxx(line.substr(pos + 1).c_str()));
   }
 
   uint32_t parse_prime_number(const std::string& file_name) {

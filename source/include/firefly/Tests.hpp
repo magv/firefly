@@ -28,7 +28,7 @@ namespace firefly {
    */
   template<typename FFIntTemp>
   FFIntTemp singular_solver(const std::vector<FFIntTemp>& yis) {
-    FFIntTemp cr_1(mpz_class("123456789109898799879870980"));
+    FFIntTemp cr_1(fmpzxx("123456789109898799879870980"));
     FFIntTemp test = 17 * yis[0];
     FFIntTemp num = 17 * yis[0] + 7 * yis[1] + yis[2] + yis[0].pow(2) + yis[1].pow(2) + yis[2].pow(2) + yis[3].pow(2) + yis[0] * yis[3].pow(3) + yis[1].pow(4) + yis[3].pow(7) + yis[2].pow(7);
     FFIntTemp den = cr_1 * yis[1] - yis[3] + yis[0] * yis[1] + yis[1] * yis[2] + yis[0] * yis[3] + yis[0].pow(2) * yis[1].pow(2) + yis[2].pow(4);
@@ -58,9 +58,9 @@ namespace firefly {
    */
   template<typename FFIntTemp>
   FFIntTemp n_eq_4(const std::vector<FFIntTemp>& yis) {
-    mpz_class cr_1_mpz;
+    fmpzxx cr_1_mpz;
     cr_1_mpz = "123456789109898799879870980";
-    mpz_class cr_2_mpz;
+    fmpzxx cr_2_mpz;
     cr_2_mpz = "123456789109898799879";
     FFIntTemp cr_1(cr_1_mpz);
     FFIntTemp cr_2(cr_2_mpz);
@@ -276,7 +276,7 @@ namespace firefly {
    */
   template<typename FFIntTemp>
   FFIntTemp bench_2(const std::vector<FFIntTemp>& yis) {
-    mpz_class cr_1_mpz;
+    fmpzxx cr_1_mpz;
     cr_1_mpz = "123456789109898799879870980";
     FFIntTemp num = cr_1_mpz * ((1 + yis[0] + yis[1] + yis[2] + yis[3] + yis[4]).pow(20) - 1);
     FFIntTemp den = yis[3] - yis[1] + (yis[0] * yis[1] * yis[2] * yis[3] * yis[4]).pow(10);

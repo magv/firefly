@@ -20,6 +20,7 @@
 
 #include <math.h>
 #include <random>
+#include <algorithm>
 
 namespace firefly {
 

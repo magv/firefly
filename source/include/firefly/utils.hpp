@@ -30,9 +30,9 @@ namespace firefly {
    *    @returns the combination of p1 and p2 corresponding to the chinese
    *    remainder theorem
    */
-  std::pair<mpz_class, mpz_class> run_chinese_remainder(
-    const std::pair<mpz_class, mpz_class>& p1,
-    const std::pair<mpz_class, mpz_class>& p2);
+  std::pair<fmpzxx, fmpzxx> run_chinese_remainder(
+    const std::pair<fmpzxx, fmpzxx>& p1,
+    const std::pair<fmpzxx, fmpzxx>& p2);
 
   /**
    *    Applies the rational reconstruction algorithm
@@ -41,7 +41,7 @@ namespace firefly {
    *    @return a RationalNumber which has been reconstruction using the
    *    rational reconstruction algorithm
    */
-  std::pair<bool, RationalNumber> get_rational_coef(const mpz_class& a, const mpz_class& p);
+  std::pair<bool, RationalNumber> get_rational_coef(const fmpzxx& a, const fmpzxx& p);
 
   /**
    *    Applies the rational reconstruction algorithm MQRR from
@@ -52,7 +52,7 @@ namespace firefly {
    *    @return a RationalNumber which has been reconstruction using the
    *    rational reconstruction algorithm
    */
-  std::pair<bool, RationalNumber> get_rational_coef_mqrr(const mpz_class& a, const mpz_class& p);
+  std::pair<bool, RationalNumber> get_rational_coef_mqrr(const fmpzxx& a, const fmpzxx& p);
 
   /**
   *  Solves the given modified Vandermonde system

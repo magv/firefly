@@ -125,8 +125,7 @@ set_target_properties(FireFly_static PROPERTIES OUTPUT_NAME firefly)
 add_library(FireFly_shared SHARED ${LIBSOURCES})
 set_target_properties(FireFly_shared PROPERTIES OUTPUT_NAME firefly)
 
-set(LIBS ${GMP_LIBRARIES} ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-set(LIBS ${LIBS} ${FLINT_LIBRARY})
+set(LIBS ${FLINT_LIBRARY} ${GMP_LIBRARIES} ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 if("${WITH_MPI}" STREQUAL true)
   #string(STRIP ${MPI_CXX_LINK_FLAGS} MPI_CXX_LINK_FLAGS)

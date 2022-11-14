@@ -27,12 +27,12 @@ namespace firefly {
 
   FFInt::FFInt(const FFInt& ffint) : n(ffint.n) {}
 
-  FFInt::FFInt(mpz_class in) {
-    in = in % mpz_class(std::to_string(p));
-
-    if (in < 0) in = mpz_class(std::to_string(p)) + in;
-
-    n = std::stoull(in.get_str());
+  FFInt::FFInt(const fmpzxx &in) {
+      nmod_t mod;
+      mod.n = FFInt::p;
+      mod.ninv = FFInt::p_inv;
+      count_leading_zeros(mod.norm, mod.n);
+      n = fmpz_get_nmod(in._fmpz(), mod);
   }
 
   /* This function is a part of the program Kira.

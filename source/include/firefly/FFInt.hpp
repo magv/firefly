@@ -21,12 +21,16 @@
 #include "firefly/config.hpp"
 
 #include <flint/ulong_extras.h>
-#include <gmpxx.h>
+#include <flint/fmpzxx.h>
+#include <flint/fmpqxx.h>
 #include <iostream>
 #include <string>
 #include <vector>
 
 namespace firefly {
+
+  typedef flint::fmpzxx fmpzxx;
+  typedef flint::fmpqxx fmpqxx;
 
   /**
   * @class FFInt
@@ -46,10 +50,10 @@ namespace firefly {
      */
     FFInt(const FFInt& ffint);
     /**
-     *  A constructer for a mpz_class object
-     *  @param in the mpz_class object which should be converted to an FFInt
+     *  A constructer for a flint::fmpzxx object
+     *  @param in the flint::fmpzxx object which should be converted to an FFInt
      */
-    FFInt(mpz_class in);
+    FFInt(const fmpzxx &in);
     [[deprecated("Old and slow parser, which will be removed in the next release. Use the shunting-yard parser instead.")]]
     FFInt(const std::string& str, const std::vector<std::pair<std::string, uint64_t>>& replacements);
     /**

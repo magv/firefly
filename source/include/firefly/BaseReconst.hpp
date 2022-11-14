@@ -19,6 +19,7 @@
 #pragma once
 
 #include "firefly/config.hpp"
+#include "firefly/FFInt.hpp"
 #include "firefly/PolynomialFF.hpp"
 #include "firefly/UintHasher.hpp"
 
@@ -26,10 +27,11 @@
 #include <queue>
 
 namespace firefly {
-  typedef std::unordered_map<std::vector<uint32_t>, mpz_class, UintHasher> mpz_map;
-  typedef std::unordered_map<uint32_t, std::unordered_map<std::vector<uint32_t>, mpz_class, UintHasher>> mpz_map_map;
+  typedef std::unordered_map<std::vector<uint32_t>, fmpzxx, UintHasher> mpz_map;
+  typedef std::unordered_map<uint32_t, std::unordered_map<std::vector<uint32_t>, fmpzxx, UintHasher>> mpz_map_map;
   typedef std::unordered_map<std::pair<uint32_t, uint32_t>, FFInt, UintPairHasher> ff_pair_map;
   typedef std::unordered_map<std::vector<uint32_t>, RationalNumber, UintHasher> rn_map;
+  typedef std::unordered_map<std::vector<uint32_t>, fmpqxx, UintHasher> fmpq_map;
   typedef std::unordered_map<std::vector<uint32_t>, std::unordered_map<std::vector<uint32_t>, FFInt, UintHasher>, UintHasher> ff_map_map;
   typedef std::unordered_map<std::vector<uint32_t>, std::queue<std::pair<FFInt, FFInt>>, UintHasher> ff_queue_map;
   typedef std::unordered_map<std::vector<uint32_t>, uint32_t, UintHasher> uint32_t_map;
@@ -103,7 +105,7 @@ namespace firefly {
     void set_seed(uint64_t seed);
   protected:
     std::vector<uint32_t> curr_zi_order {}; /**< A vector which holds the current zi_order. It's length is n - 1 since the first variable is always set to 1. */
-    mpz_class combined_prime; /**< The combination of the used prime numbers with the chinese remained theorem */
+    fmpzxx combined_prime; /**< The combination of the used prime numbers with the chinese remained theorem */
     mutable std::mutex mutex_status; /**< A mutex to make all status variables thread safe */
     uint32_t prime_number = 0; /**< An integer which indicates the currently used prime counter */
     uint32_t num_eqn = 0; /**< An integer which indicates the currently needed number of equations to get to the next zi_order  */
@@ -116,11 +118,11 @@ namespace firefly {
     bool new_prime = false; /**< A bool which indicates if the reconstruction needs a new prime */
     bool is_interpolating = false; /**< A bool which indicates if the object is currently interpolating the black box */
     /**
-     *    Converts the coefficients of a rational function from FFInts to mpz_class
+     *    Converts the coefficients of a rational function from FFInts to fmpzxx
      *    objects
      *    @param coefs a ff_map over a finite field
      *    @return the coefficients of the given rational function converted to
-     *    mpz_class objects
+     *    fmpzxx objects
      */
     mpz_map convert_to_mpz(const ff_map& coefs) const;
     /**

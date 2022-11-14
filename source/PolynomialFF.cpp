@@ -20,6 +20,7 @@
 #include "firefly/Logger.hpp"
 
 #include <map>
+#include <algorithm>
 
 namespace firefly {
 

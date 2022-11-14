@@ -19,8 +19,8 @@
 #pragma once
 
 #include "firefly/config.hpp"
+#include "firefly/FFInt.hpp"
 
-#include <gmpxx.h>
 #include <iostream>
 #include <string>
 
@@ -33,10 +33,11 @@ namespace firefly {
   public:
     /**
      *  Constructor of a RationalNumber object
-     *  @param numerator_ the numerator as a mpz_class
-     *  @param denominator_ the denominator as a mpz_class
+     *  @param numerator_ the numerator as a fmpzxx
+     *  @param denominator_ the denominator as a fmpzxx
      */
-    RationalNumber(const mpz_class& numerator_, const mpz_class& denominator_);
+    RationalNumber(int numerator_, int denominator_) : RationalNumber(fmpzxx(numerator_), fmpzxx(denominator_)) {};
+    RationalNumber(const fmpzxx& numerator_, const fmpzxx& denominator_);
     RationalNumber();
     RationalNumber operator*(const RationalNumber&);
     RationalNumber& operator+=(const RationalNumber& rn);
@@ -46,8 +47,8 @@ namespace firefly {
     RationalNumber operator-() const;
     std::string string() const;
 
-    mpz_class numerator; /**< The numerator of the rational number */
-    mpz_class denominator; /**< The denominator of the rational number */
+    fmpzxx numerator; /**< The numerator of the rational number */
+    fmpzxx denominator; /**< The denominator of the rational number */
   };
 
   RationalNumber gcd(const RationalNumber& a, const RationalNumber& b);

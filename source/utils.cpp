@@ -20,35 +20,38 @@
 #include "firefly/RatReconst.hpp"
 #include "firefly/ReconstHelper.hpp"
 
+#include <algorithm>
+
 namespace firefly {
-  std::pair<mpz_class, mpz_class> run_chinese_remainder(
-    const std::pair<mpz_class, mpz_class>& p1,
-    const std::pair<mpz_class, mpz_class>& p2) {
-    mpz_class a, n, m1, m2, tmp_c;
-    mpz_t tmp;
+  std::pair<fmpzxx, fmpzxx> run_chinese_remainder(
+    const std::pair<fmpzxx, fmpzxx>& p1,
+    const std::pair<fmpzxx, fmpzxx>& p2) {
+    fmpzxx a, n, m1, m2, tmp_c;
     n = p1.second * p2.second;
-    mpz_init(tmp);
-    mpz_invert(tmp, p2.second.get_mpz_t(), p1.second.get_mpz_t());
-    tmp_c = mpz_class(tmp);
+    tmp_c = flint::invmod(p2.second, p1.second);
+    //mpz_t tmp;
+    //mpz_init(tmp);
+    //mpz_invert(tmp, p2.second.get_mpz_t(), p1.second.get_mpz_t());
+    //tmp_c = fmpzxx(tmp);
     m1 = tmp_c * p2.second;
-    m2 = (1 - m1) % n;
+    m2 = (fmpzxx(1) - m1) % n;
 
     if (m2 < 0) m2 = m2 + n;
 
     a = (m1 * p1.first + m2 * p2.first) % n;
 
-    mpz_clear(tmp);
-    return std::pair<mpz_class, mpz_class> (a, n);
+    //mpz_clear(tmp);
+    return std::pair<fmpzxx, fmpzxx> (a, n);
   }
 
-  std::pair<bool, RationalNumber> get_rational_coef(const mpz_class& a, const mpz_class& p) {
-    mpz_class t = 0;
-    mpz_class newt = 1;
-    mpz_class tmpt;
-    mpz_class r = p;
-    mpz_class newr = a;
-    mpz_class tmpr;
-    mpz_class q;
+  std::pair<bool, RationalNumber> get_rational_coef(const fmpzxx& a, const fmpzxx& p) {
+    fmpzxx t = fmpzxx(0);
+    fmpzxx newt = fmpzxx(1);
+    fmpzxx tmpt;
+    fmpzxx r = p;
+    fmpzxx newr = a;
+    fmpzxx tmpr;
+    fmpzxx q;
     bool not_failed = true;
 
     while (2 * newr * newr > p) {
@@ -68,7 +71,7 @@ namespace firefly {
     }
 
     if (newt < 0)
-      return std::make_pair(not_failed, RationalNumber(-newr, abs(newt)));
+      return std::make_pair(not_failed, RationalNumber((-newr).evaluate(), abs(newt).evaluate()));
 
     return std::make_pair(not_failed, RationalNumber(newr, newt));
   }
@@ -77,9 +80,9 @@ namespace firefly {
    * Maximal Quotient Rational Reconstruction: An Almost Optimal Algorithm for Rational Reconstruction
    * by M. Monagan
    */
-  std::pair<bool, RationalNumber> get_rational_coef_mqrr(const mpz_class& u, const mpz_class& p) {
+  std::pair<bool, RationalNumber> get_rational_coef_mqrr(const fmpzxx& u, const fmpzxx& p) {
     // set to T so that less than one percent will be false positive results
-    mpz_class T = 1024 * mpz_sizeinbase(p.get_mpz_t(), 2);
+    fmpzxx T = fmpzxx(1024 * p.sizeinbase(2));
     bool not_failed = true;
 
     if (u == 0) {
@@ -89,18 +92,18 @@ namespace firefly {
         return std::make_pair(false, RationalNumber(0, 1));
     }
 
-    mpz_class n = 0;
-    mpz_class d = 0;
-    mpz_class t0 = 0;
-    mpz_class r0 = p;
-    mpz_class t1 = 1;
-    mpz_class r1 = u;
-    mpz_class tmpr;
-    mpz_class tmpt;
-    mpz_class q;
+    fmpzxx n = fmpzxx(0);
+    fmpzxx d = fmpzxx(0);
+    fmpzxx t0 = fmpzxx(0);
+    fmpzxx r0 = p;
+    fmpzxx t1 = fmpzxx(1);
+    fmpzxx r1 = u;
+    fmpzxx tmpr;
+    fmpzxx tmpt;
+    fmpzxx q;
 
     while (r1 != 0 && r0 > T) {
-      q = r0 / r1; // mpz_class automatically rounds off
+      q = r0 / r1; // fmpzxx automatically rounds off
 
       if (q > T) {
         n = r1;
@@ -123,7 +126,7 @@ namespace firefly {
     }
 
     if (d < 0)
-      return std::make_pair(not_failed, RationalNumber(-n, abs(d)));
+      return std::make_pair(not_failed, RationalNumber((-n).evaluate(), abs(d).evaluate()));
 
     return std::make_pair(not_failed, RationalNumber(n, d));
   }

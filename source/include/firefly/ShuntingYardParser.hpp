@@ -301,7 +301,7 @@ namespace firefly {
             if (token[0] == '+')
               tmp.erase(0, 1);
 
-            nums.push(FFIntTemp(mpz_class(tmp)));
+            nums.push(FFIntTemp(fmpzxx(tmp)));
           } else {
             if (token[0] == '-') {
               std::string tmp = token;

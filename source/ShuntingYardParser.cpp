@@ -22,6 +22,7 @@
 
 #include <chrono>
 #include <fstream>
+#include <algorithm>
 
 namespace firefly {
 
@@ -437,7 +438,7 @@ namespace firefly {
           if (token[0] == '+')
             tmp.erase(0, 1);
 
-          nums.push(FFInt(mpz_class(tmp)));
+          nums.push(FFInt(fmpzxx(tmp.c_str())));
         } else {
           if (token[0] == '-') {
             std::string tmp = token;
@@ -675,7 +676,7 @@ namespace firefly {
           if (token[0] == '+')
             tmp.erase(0, 1);
 
-          precomp_tokens[i][j] = {tokens::NUMBER, FFInt(mpz_class(tmp))};
+          precomp_tokens[i][j] = {tokens::NUMBER, FFInt(fmpzxx(tmp.c_str()))};
           partial_rpn[i].emplace_back(std::make_pair(j, std::vector<std::string>(1, tmp)));
         } else {
           if (token[0] == '-') {

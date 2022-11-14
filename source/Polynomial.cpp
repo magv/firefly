@@ -21,6 +21,8 @@
 #include "firefly/Logger.hpp"
 #include "firefly/utils.hpp"
 
+#include <algorithm>
+
 namespace firefly {
 
   Polynomial::Polynomial(const rn_map& coef) {
