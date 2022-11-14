@@ -16,24 +16,6 @@
 //    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //==================================================================================
 
-#if @FLINT_FLAG@ == 1
-  #define FLINT 1
-#else
-  #undef FLINT
-#endif
-
-#if @DEFAULT_FLAG@ == 1
-  #define DEFAULT 1
-#else
-  #undef DEFAULT
-#endif
-
-#if @CUSTOM_FLAG@ == 1
-  #define CUSTOM 1
-#else
-  #undef CUSTOM
-#endif
-
 #if @MPI_FLAG@ == 1
   #define WITH_MPI 1
 #else

@@ -89,7 +89,6 @@ namespace firefly {
     n = 0;
   }
 
-#ifdef FLINT
   FFInt& FFInt::operator+=(const FFInt& ffint) {
     n = (p - ffint.n > n ? n + ffint.n : n + ffint.n - p);
     return *this;
@@ -125,67 +124,6 @@ namespace firefly {
   FFInt operator-(const FFInt& a, const FFInt& b) {
     return FFInt((b.n > a.n ? a.n - b.n + FFInt::p : a.n - b.n));
   }
-#endif
-
-#ifdef DEFAULT
-  FFInt& FFInt::operator+=(const FFInt& ffint) {
-    n = (p - ffint.n > n ? n + ffint.n : n + ffint.n - p);
-    return *this;
-  }
-
-  FFInt& FFInt::operator-=(const FFInt& ffint) {
-    n = (ffint.n > n ? n - ffint.n + p : n - ffint.n);
-    return *this;
-  }
-
-  FFInt& FFInt::operator*=(const FFInt& ffint) {
-    n = mod_mul(n, ffint.n, p);
-    return *this;
-  }
-
-  FFInt& FFInt::operator/=(const FFInt& ffint) {
-    if(ffint.n == 0){
-      n = 0;
-      return *this;
-    }
-    n = mod_mul(n, mod_inv(ffint.n, p), p);
-    return *this;
-  }
-
-  FFInt FFInt::pow(const FFInt& ffint) const {
-    FFInt res = 1;
-
-    if (ffint.n == 2u) {
-      // Fast-track
-      res = mod_mul(n, n, p);
-    } else {
-      uint64_t exp;
-      uint64_t base;
-
-      if (ffint.n < (p >> 1)) {
-        // treat as positive exponent
-        exp = ffint.n;
-        base = n;
-      } else {
-        // treat as negative exponent
-        exp = p - ffint.n - 1;
-        base = mod_inv(n, p); // =1/b.c
-      }
-
-      res.n = mod_pow(base, exp, p);
-    }
-
-    return res;
-  }
-
-  FFInt operator+(const FFInt& a, const FFInt& b) {
-    return FFInt((FFInt::p - b.n > a.n ? a.n + b.n : a.n + b.n - FFInt::p));
-  }
-
-  FFInt operator-(const FFInt& a, const FFInt& b) {
-    return FFInt((b.n > a.n ? a.n - b.n + FFInt::p : a.n - b.n));
-  }
-#endif
 
   FFInt FFInt::operator-() const {
     return FFInt(p - n);
@@ -269,17 +207,10 @@ namespace firefly {
 
       // result=0 in the first pass or when the string is zero padded
       // on the left so that the first (few) chunks give zero.
-#ifdef FLINT
 
       if (result) result = n_mulmod2_preinv(result, 1000000000000000000uLL, FFInt::p, FFInt::p_inv);
 
       result = n_addmod(result, intchunk, FFInt::p);
-#else
-
-      if (result) result = (FFInt(result) * FFInt(1000000000000000000uLL)).n;
-
-      result = (FFInt(result) + FFInt(intchunk)).n;
-#endif
     }
 
     return result;
@@ -309,7 +240,6 @@ namespace firefly {
     return (a.n >= b.n);
   }
 
-#ifdef FLINT
   FFInt operator/(const FFInt& a, const FFInt& b) {
     if(b.n == 0)
       return 0;
@@ -319,19 +249,6 @@ namespace firefly {
   FFInt operator*(const FFInt& a, const FFInt& b) {
     return FFInt(n_mulmod2_preinv(a.n, b.n, FFInt::p, FFInt::p_inv));
   }
-#endif
-
-#ifdef DEFAULT
-  FFInt operator/(const FFInt& a, const FFInt& b) {
-    if(b.n == 0)
-      return 0;
-    return FFInt(mod_mul(a.n, mod_inv(b.n, FFInt::p), FFInt::p));
-  }
-
-  FFInt operator*(const FFInt& a, const FFInt& b) {
-    return FFInt(mod_mul(a.n, b.n, FFInt::p));
-  }
-#endif
 
   FFInt pow(const FFInt& ffint, const FFInt& power) {
     return ffint.pow(power);
@@ -341,69 +258,11 @@ namespace firefly {
     out << ffint.n;
     return out;
   }
-#ifdef FLINT
+
   void FFInt::set_new_prime(uint64_t prime) {
     FFInt::p = prime;
     FFInt::p_inv = n_preinvert_limb(prime);
   }
-#else
-  void FFInt::set_new_prime(uint64_t prime) {
-    FFInt::p = prime;
-  }
-#endif
-
-#ifdef DEFAULT
-  uint64_t mod_mul(uint64_t a, uint64_t b, uint64_t m) {
-    long double x;
-    uint64_t c;
-    int64_t r;
-
-    if (a >= m) a %= m;
-
-    if (b >= m) b %= m;
-
-    x = a;
-    c = x * b / m;
-    r = (int64_t)(a * b - c * m) % (int64_t)m;
-    return r < 0 ? r + m : r;
-  }
-
-  uint64_t mod_pow(uint64_t base, uint64_t exp, uint64_t m) {
-    // m must be at most 63 bit
-    uint64_t res = 1;
-
-    while (exp) {
-      if (exp & 1) res = mod_mul(res, base, m);
-
-      base = mod_mul(base, base, m);
-      exp >>= 1;
-    }
-
-    return res;
-  }
-
-  uint64_t mod_inv(uint64_t a, uint64_t m) {
-    int64_t t {0};
-    int64_t newt {1};
-    int64_t tmpt;
-    uint64_t r {m};
-    uint64_t newr {a};
-    uint64_t tmpr;
-    uint64_t q;
-
-    while (newr) {
-      q = r / newr;
-      tmpt = t;
-      t = newt;
-      newt = tmpt - q * newt;
-      tmpr = r;
-      r = newr;
-      newr = tmpr - q * newr;
-    }
-
-    return t < 0 ? t + m : t;
-  }
-#endif
 
   void firefly_exists(void) {}
 }

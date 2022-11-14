@@ -21,7 +21,7 @@ Please refer to these papers when using FireFly:
 FireFly requires:
 * C++ compiler supporting C++14
 * [CMake](https://cmake.org/) >= 3.1
-* [FLINT](http://www.flintlib.org/) >= 2.5 (optional)
+* [FLINT](http://www.flintlib.org/) >= 2.5
 * [GMP](https://gmplib.org/) >= 6.1.2 (compiled with --enable-cxx)
 * [zlib](https://www.zlib.net/) >= 1.2.11
 * MPI >= 3 (optional, mpich recommended)
@@ -47,7 +47,7 @@ FireFly uses CMake to generate files for build automation. To build FireFly one 
 cd $FIREFLY_PATH
 mkdir build
 cd build
-cmake -DWITH_FLINT=true .. # Without FLINT: -DWITH_FLINT=false or omit this
+cmake ..
 ```
 
 After calling `cmake` the build directory contains all required build files. Assuming that GNU make is used, one can start the build by running
@@ -64,7 +64,7 @@ make install
 
 By default the code is compiled with optimizations.
 
-If FLINT is used for modular arithmetic and it cannot be found in the default system directories, one has to add the additional flags:
+If FLINT is cannot be found in the default system directories, one has to add the additional flags:
 
 ```
 -DFLINT_INCLUDE_DIR=$FLINT_INC_PATH -DFLINT_LIBRARY=$FLINT_LIB_PATH
@@ -96,8 +96,6 @@ where `MPI_INC_PATH` is the absolute path to the directory where the include fil
 
 Below is a list of all build options for `FireFly`:
 
-* `-DWITH_FLINT=true` (default: `false`): Employ FLINT for the modular arithmetic (highly recommended).
-* `-DCUSTOM=true` (default: `false`): Employ a custom modular arithmetic.
 * `-DWITH_JEMALLOC=true` (default: `false`): Employ jemalloc for malloc operations (highly recommended).
 * `-DWITH_MPI=true` (default: `false`): Enable MPI support.
 * `-DGMP_INCLUDE_DIRS=$GMP_INC_PATH` (default: not set): If GMP is not automatically found, one has to manually set the absolute path to its header files (`gmpxx.h` is required).

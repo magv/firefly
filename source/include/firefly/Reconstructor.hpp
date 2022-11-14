@@ -34,9 +34,7 @@
 #include "firefly/MPIWorker.hpp"
 #endif
 
-#ifdef FLINT
 #include <flint/fmpz_poly.h>
-#endif
 
 #include <chrono>
 #include <numeric>
@@ -493,10 +491,6 @@ namespace firefly {
   template<typename BlackBoxTemp>
   void Reconstructor<BlackBoxTemp>::enable_factor_scan() {
     factor_scan = true;
-#ifndef FLINT
-    WARNING_MSG("FireFly is not compiled with FLINT. No polynomial factoring possible!");
-    factor_scan = false;
-#endif
   }
 
   template<typename BlackBoxTemp>
@@ -1341,7 +1335,6 @@ namespace firefly {
 
   template<typename BlackBoxTemp>
   void Reconstructor<BlackBoxTemp>::scan_for_factors() {
-#ifdef FLINT
     auto clock_1 = std::chrono::high_resolution_clock::now();
     factorizations.reserve(n);
 
@@ -1959,7 +1952,6 @@ namespace firefly {
     factors_degs.clear();
 
     prime_start = std::chrono::high_resolution_clock::now();
-#endif
   }
 
   template<typename BlackBoxTemp>

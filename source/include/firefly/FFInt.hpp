@@ -20,9 +20,7 @@
 
 #include "firefly/config.hpp"
 
-#ifdef FLINT
 #include <flint/ulong_extras.h>
-#endif
 #include <gmpxx.h>
 #include <iostream>
 #include <string>
@@ -107,24 +105,6 @@ namespace firefly {
   FFInt pow(const FFInt& ffint, const T& power);
   std::ostream& operator<<(std::ostream& out, const FFInt& ffint);
 
-#ifdef DEFAULT
-  uint64_t mod_mul(uint64_t a, uint64_t b, uint64_t m);
-  /**
-   *  Performs a exponentiation modulo m
-   *  @param base the base
-   *  @param exp the exponent
-   *  @param m the modulus
-   *  @return (base^exp) mod m
-   */
-  uint64_t mod_pow(uint64_t base, uint64_t exp, uint64_t m);
-  /**
-   *  Calculates the multiplicative inverse using the Extended Euclidean Algorithm
-   *  @param a the integer of which the multiplicative inverse should be calculated
-   *  @param m the modulus
-   */
-  uint64_t mod_inv(uint64_t a, uint64_t m);
-#endif
-
   template<class T, typename>
   FFInt::FFInt(const T n_) {
     if (n_ >= 0) {
@@ -138,39 +118,10 @@ namespace firefly {
     }
   }
 
-#ifdef FLINT
   template<class T, typename>
   FFInt FFInt::pow(const T& power) const {
     return FFInt(n_powmod2_preinv(n, power, p, p_inv));
   }
-#endif
-
-#ifdef DEFAULT
-  template<class T, typename>
-  FFInt FFInt::pow(const T& power) const {
-    FFInt res = 1;
-
-    if (power == 2) {
-      // Fast-track
-      res = mod_mul(n, n, p);
-    } else {
-      uint64_t exp;
-      uint64_t base;
-
-      if (power >= 0) {
-        exp = power;
-        base = n;
-      } else {
-        exp = static_cast<uint64_t>(-power);
-        base = mod_inv(n, p);
-      }
-
-      res.n = mod_pow(base, exp, p);
-    }
-
-    return res;
-  }
-#endif
 
   template<class T, typename>
   FFInt pow(const FFInt& ffint, const T& power) {

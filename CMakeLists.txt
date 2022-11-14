@@ -60,26 +60,15 @@ include_directories(${GMP_INCLUDE_DIRS})
 include_directories(${ZLIB_INCLUDE_DIRS})
 set(PKG_INCLUDE -I${GMP_INCLUDE_DIRS} -I${ZLIB_INCLUDE_DIRS})
 
-set(FLINT_FLAG "0")
-set(DEFAULT_FLAG "0")
-set(CUSTOM_FLAG "0")
 set(MPI_FLAG "0")
 
 # Check for FLINT
 # if you want to use FLINT instead of our default implementation, call cmake with
 # cmake -DWITH_FLINT=true ..
 # set(WITH_FLINT false)
-if("${CUSTOM}" STREQUAL true)
-  set(CUSTOM_FLAG "1")
-elseif("${WITH_FLINT}" STREQUAL true)
-  find_package(FLINT REQUIRED)
-  include_directories(${FLINT_INCLUDE_DIR})
-  set(PKG_INCLUDE ${PKG_INCLUDE} -I${FLINT_INCLUDE_DIR})
-  set(FLINT_FLAG "1")
-else()
-  message("-- ${Red}Using default implementation of modular arithmetic. This can be much slower than FLINT!${ColourReset}")
-  set(DEFAULT_FLAG "1")
-endif()
+find_package(FLINT REQUIRED)
+include_directories(${FLINT_INCLUDE_DIR})
+set(PKG_INCLUDE ${PKG_INCLUDE} -I${FLINT_INCLUDE_DIR})
 
 # Check for MPI
 if("${WITH_MPI}" STREQUAL true)
@@ -137,9 +126,7 @@ add_library(FireFly_shared SHARED ${LIBSOURCES})
 set_target_properties(FireFly_shared PROPERTIES OUTPUT_NAME firefly)
 
 set(LIBS ${GMP_LIBRARIES} ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-if("${WITH_FLINT}" STREQUAL true)
-  set(LIBS ${LIBS} ${FLINT_LIBRARY})
-endif()
+set(LIBS ${LIBS} ${FLINT_LIBRARY})
 
 if("${WITH_MPI}" STREQUAL true)
   #string(STRIP ${MPI_CXX_LINK_FLAGS} MPI_CXX_LINK_FLAGS)
@@ -169,9 +156,7 @@ if ("${WITH_JEMALLOC}" STREQUAL "true")
   set(LIBS ${JEMALLOC_LIB} ${LIBS})
 endif()
 
-if("${CUSTOM}" STREQUAL "true")
-  message("-- ${Red}Using custom modular arithmetic. The example is thus not compiled.${ColourReset}")
-elseif("${WITH_MPI}" STREQUAL "true")
+if("${WITH_MPI}" STREQUAL "true")
   add_executable(example ${EXAMPLE_EXE})
   target_link_libraries(example FireFly_static ${LIBS})
   target_link_libraries(FireFly_shared ${LIBS})
@@ -244,7 +229,7 @@ if("${DISABLE_INSTALL}" STREQUAL "")
     DESTINATION "${INCLUDE_INSTALL_DIR}")
 
   # install ibp insertion executable
-  if(NOT "${CUSTOM}" STREQUAL "true" AND NOT "${WITH_MPI}" STREQUAL "true")
+  if(NOT "${WITH_MPI}" STREQUAL "true")
     install(TARGETS ff_insert DESTINATION "${BIN_INSTALL_DIR}")
     if("${FIREFLY_EXECUTABLE}" STREQUAL "true")
       install(TARGETS firefly DESTINATION "${BIN_INSTALL_DIR}")

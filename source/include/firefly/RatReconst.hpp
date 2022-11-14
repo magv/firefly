@@ -24,9 +24,7 @@
 #include "firefly/RationalFunction.hpp"
 #include "firefly/RationalFunctionFF.hpp"
 
-#ifdef FLINT
 #include <flint/nmod_poly.h>
-#endif
 
 #include <map>
 
@@ -74,7 +72,6 @@ namespace firefly {
      *  @return the result of the rational function over the current field
      */
     RationalFunctionFF get_result_ff();
-#ifdef FLINT
     /**
      *  @return the found factors over the current field, first entry is numerator, second is denominator
      */
@@ -84,7 +81,6 @@ namespace firefly {
      *  @return Canonical form of real factors as a maps, where the first entry is the degree and the second is the coefficient for all non-zero entries
      */
     std::pair<std::unordered_map<uint32_t, uint64_t>, std::unordered_map<uint32_t, uint64_t>> get_canonical_factors(const std::pair<std::unordered_set<uint32_t>, std::unordered_set<uint32_t>>& factors_pos);
-#endif
     /**
      *  Starts an interpolation job
      *  @return a tuple consisting of:
@@ -425,10 +421,8 @@ namespace firefly {
     std::queue<std::tuple<FFInt, FFInt, std::vector<uint32_t>>> saved_food; /**< Data structre used to write already used probes to a file from which one can resume if crashes occur. First FFInt is t second is num */
     std::map<std::vector<uint32_t>, std::vector<std::pair<uint64_t, uint64_t>>> parsed_probes {};
     std::pair<std::list<uint32_t>, std::list<uint32_t>> factor_degs {}; /**< Stores the degrees after one run with Thiele to build a system of equations instead */
-#ifdef FLINT
     std::pair<std::vector<std::string>, std::vector<std::string>> factors; /**< Stores the found factors over the current field */
     std::pair<std::vector<std::pair<std::string, uint32_t>>, std::vector<std::pair<std::string, uint32_t>>> factors_flint; /**< Stores the found factors over the current field, second entry is exponent of factor */
-#endif
     int max_deg_num = -1; /**< The maximal degree of the numerator */
     int max_deg_den = -1; /**< The maximal degree of the denominator */
     uint32_t vandermonde_size = 1; /**< Multiplicity of Vandermonde systems requried by PolyReconst */
