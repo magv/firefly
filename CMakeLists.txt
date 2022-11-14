@@ -62,6 +62,10 @@ set(PKG_INCLUDE -I${GMP_INCLUDE_DIRS} -I${ZLIB_INCLUDE_DIRS})
 
 set(MPI_FLAG "0")
 
+set(WITH_SHARED TRUE CACHE BOOL "Build and install the shared library")
+set(WITH_STATIC TRUE CACHE BOOL "Build and install the static library")
+set(WITH_MPI FALSE CACHE BOOL "Build with MPI support")
+
 # Check for FLINT
 # if you want to use FLINT instead of our default implementation, call cmake with
 # cmake -DWITH_FLINT=true ..
@@ -120,10 +124,14 @@ configure_file (
   "${INCLUDE_PATH_SRC}/config.hpp.in"
   "${CMAKE_CURRENT_BINARY_DIR}/include/firefly/config.hpp")
 
-add_library(FireFly_static STATIC ${LIBSOURCES})
-set_target_properties(FireFly_static PROPERTIES OUTPUT_NAME firefly)
-add_library(FireFly_shared SHARED ${LIBSOURCES})
-set_target_properties(FireFly_shared PROPERTIES OUTPUT_NAME firefly)
+if(${WITH_STATIC})
+  add_library(FireFly_static STATIC ${LIBSOURCES})
+  set_target_properties(FireFly_static PROPERTIES OUTPUT_NAME firefly)
+endif()
+if(${WITH_SHARED})
+  add_library(FireFly_shared SHARED ${LIBSOURCES})
+  set_target_properties(FireFly_shared PROPERTIES OUTPUT_NAME firefly)
+endif()
 
 set(LIBS ${FLINT_LIBRARY} ${GMP_LIBRARIES} ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
@@ -156,28 +164,46 @@ if ("${WITH_JEMALLOC}" STREQUAL "true")
 endif()
 
 if("${WITH_MPI}" STREQUAL "true")
-  add_executable(example ${EXAMPLE_EXE})
-  target_link_libraries(example FireFly_static ${LIBS})
-  target_link_libraries(FireFly_shared ${LIBS})
+  if(${WITH_STATIC})
+    add_executable(example ${EXAMPLE_EXE})
+    target_link_libraries(example FireFly_static ${LIBS})
+  endif()
+  if(${WITH_SHARED})
+    target_link_libraries(FireFly_shared ${LIBS})
+  endif()
 else()
-  add_executable(example ${EXAMPLE_EXE})
-  add_executable(ff_insert ${INSERT_IBPS_EXE})
-  target_link_libraries(example FireFly_static ${LIBS})
-  target_link_libraries(ff_insert FireFly_static ${LIBS})
-  target_link_libraries(FireFly_shared ${LIBS})
+  if(${WITH_STATIC})
+    add_executable(example ${EXAMPLE_EXE})
+    add_executable(ff_insert ${INSERT_IBPS_EXE})
+    target_link_libraries(example FireFly_static ${LIBS})
+    target_link_libraries(ff_insert FireFly_static ${LIBS})
+  endif()
+  if(${WITH_SHARED})
+    target_link_libraries(FireFly_shared ${LIBS})
+  endif()
   if("${FIREFLY_EXECUTABLE}" STREQUAL "true")
-    message("-- Building executable `firefly'. Note that it is still in development and not officially released.")
-    add_executable(firefly ${FIREFLY_EXE})
-    target_link_libraries(firefly FireFly_static ${LIBS})
+    if(${WITH_STATIC})
+      message("-- Building executable `firefly'. Note that it is still in development and not officially released.")
+      add_executable(firefly ${FIREFLY_EXE})
+      target_link_libraries(firefly FireFly_static ${LIBS})
+    endif()
   endif()
 endif()
 
 if("${DISABLE_INSTALL}" STREQUAL "")
   # install libraries
-  install(
-    TARGETS FireFly_static FireFly_shared
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib)
+  if(${WITH_STATIC})
+    install(
+      TARGETS FireFly_static
+      ARCHIVE DESTINATION lib
+      LIBRARY DESTINATION lib)
+  endif()
+  if(${WITH_SHARED})
+    install(
+      TARGETS FireFly_shared
+      ARCHIVE DESTINATION lib
+      LIBRARY DESTINATION lib)
+  endif()
 
   set(PKG_LIBS ${LIBS})
   list(REMOVE_DUPLICATES PKG_LIBS)
@@ -229,7 +255,9 @@ if("${DISABLE_INSTALL}" STREQUAL "")
 
   # install ibp insertion executable
   if(NOT "${WITH_MPI}" STREQUAL "true")
-    install(TARGETS ff_insert DESTINATION "${BIN_INSTALL_DIR}")
+    if(${WITH_STATIC})
+      install(TARGETS ff_insert DESTINATION "${BIN_INSTALL_DIR}")
+    endif()
     if("${FIREFLY_EXECUTABLE}" STREQUAL "true")
       install(TARGETS firefly DESTINATION "${BIN_INSTALL_DIR}")
     endif()
@@ -251,16 +279,20 @@ if("${DISABLE_INSTALL}" STREQUAL "")
 
   # benchmarks
   if("${BUILD_BENCH}" STREQUAL true)
-    add_executable(benchmarks ${PROJECT_SOURCE_DIR}/benchmarks/benchmarks.cpp)
-    target_link_libraries(benchmarks FireFly_static ${LIBS})
-    add_executable(benchmarks_no_bt ${PROJECT_SOURCE_DIR}/benchmarks/benchmarks_no_bt.cpp)
-    target_link_libraries(benchmarks_no_bt FireFly_static ${LIBS})
+    if(${WITH_STATIC})
+      add_executable(benchmarks ${PROJECT_SOURCE_DIR}/benchmarks/benchmarks.cpp)
+      target_link_libraries(benchmarks FireFly_static ${LIBS})
+      add_executable(benchmarks_no_bt ${PROJECT_SOURCE_DIR}/benchmarks/benchmarks_no_bt.cpp)
+      target_link_libraries(benchmarks_no_bt FireFly_static ${LIBS})
+    endif()
   endif()
 
-  add_custom_command(TARGET FireFly_shared POST_BUILD COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --blue --bold --no-newline "FireFly info: ")
-  add_custom_command(TARGET FireFly_shared POST_BUILD COMMAND ${CMAKE_COMMAND} -E echo "To run the example type: ./example")
-  add_custom_command(TARGET FireFly_shared POST_BUILD COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --blue --bold --no-newline "FireFly info: ")
-  add_custom_command(TARGET FireFly_shared POST_BUILD COMMAND ${CMAKE_COMMAND} -E echo "To run the inserter type: ./ff_insert")
-  add_custom_command(TARGET FireFly_shared POST_BUILD COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --blue --bold --no-newline "FireFly info: ")
-  add_custom_command(TARGET FireFly_shared POST_BUILD COMMAND ${CMAKE_COMMAND} -E echo "To compile and run tests type: make check")
+  if(${WITH_SHARED})
+    add_custom_command(TARGET FireFly_shared POST_BUILD COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --blue --bold --no-newline "FireFly info: ")
+    add_custom_command(TARGET FireFly_shared POST_BUILD COMMAND ${CMAKE_COMMAND} -E echo "To run the example type: ./example")
+    add_custom_command(TARGET FireFly_shared POST_BUILD COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --blue --bold --no-newline "FireFly info: ")
+    add_custom_command(TARGET FireFly_shared POST_BUILD COMMAND ${CMAKE_COMMAND} -E echo "To run the inserter type: ./ff_insert")
+    add_custom_command(TARGET FireFly_shared POST_BUILD COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --blue --bold --no-newline "FireFly info: ")
+    add_custom_command(TARGET FireFly_shared POST_BUILD COMMAND ${CMAKE_COMMAND} -E echo "To compile and run tests type: make check")
+  endif()
 endif()
