@@ -25,6 +25,7 @@
 #include "firefly/ThreadPool.hpp"
 #include "firefly/utils.hpp"
 
+#define OMPI_SKIP_MPICXX 1
 #include <mpi.h>
 
 namespace firefly {

@@ -45,6 +45,8 @@ namespace firefly {
      */
     PolynomialFF(uint32_t n_, ff_map coefs_);
     PolynomialFF& operator=(const PolynomialFF&) = default;
+    PolynomialFF(const PolynomialFF&) = default;
+    PolynomialFF(PolynomialFF&&) = default;
     PolynomialFF& operator-=(const PolynomialFF&);
     PolynomialFF& operator+=(const PolynomialFF&);
     PolynomialFF& operator*=(const FFInt&);

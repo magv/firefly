@@ -399,7 +399,7 @@ namespace firefly {
 
     if (verbosity > SILENT) {
       if(!printed_logo) {
-        std::cout << "\nFire\033[1;32mFly\033[0m " << FireFly_VERSION_MAJOR << "."
+        std::cerr << "\nFire\033[1;32mFly\033[0m " << FireFly_VERSION_MAJOR << "."
                   << FireFly_VERSION_MINOR << "." << FireFly_VERSION_RELEASE << "\n\n";
         printed_logo = true;
       }
@@ -441,7 +441,7 @@ namespace firefly {
 
     if (verbosity > SILENT) {
             if(!printed_logo) {
-        std::cout << "\nFire\033[1;32mFly\033[0m " << FireFly_VERSION_MAJOR << "."
+        std::cerr << "\nFire\033[1;32mFly\033[0m " << FireFly_VERSION_MAJOR << "."
                   << FireFly_VERSION_MINOR << "." << FireFly_VERSION_RELEASE << "\n\n";
         printed_logo = true;
       }
@@ -924,7 +924,7 @@ namespace firefly {
       logger << "\n" << "Promote to new prime field: F(" << std::to_string(primes()[prime_it]) << ")\n";
 
       if (verbosity > SILENT) {
-        std::cout << "\n";
+        std::cerr << "\n";
         INFO_MSG("Promote to new prime field: F(" + std::to_string(primes()[prime_it]) + ")");
       }
 
@@ -1933,6 +1933,7 @@ namespace firefly {
 
     logger << "Average time of the black-box probe: " << std::to_string(average_black_box_time) << " s\n";
 
+    logger << "Found " << std::to_string(total_number_of_factors) << " factors in total\n";
     logger << var_order << "\n\n";
 
     if (!scan) {
@@ -1946,6 +1947,7 @@ namespace firefly {
       INFO_MSG("Completed factor scan in " + std::to_string(std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - clock_1).count()) +
                " s | " + std::to_string(total_iterations) + " probes in total");
       INFO_MSG("Average time of the black-box probe: " + std::to_string(average_black_box_time) + " s");
+      INFO_MSG("Found " + std::to_string(total_number_of_factors) + " factors in total");
       INFO_MSG(var_order + "\n");
 
       if (!scan) {

@@ -390,7 +390,7 @@ int main(int argc, char* argv[]) {
           }
 
           if (i + 1 != masters) {
-            std::cout << "\n";
+            std::cerr << "\n";
             INFO_MSG("Coefficients done: " + std::to_string(i + 1) + " / " + std::to_string(masters) + "\n");
             INFO_MSG("Reconstructing coefficient of basis function: " + ap.get_master(i + 1) + "\n");
             logger.open("ff_insert.log", std::ios_base::app);
@@ -406,7 +406,7 @@ int main(int argc, char* argv[]) {
         file << "}\n";
         file.close();
 
-        std::cout << "\n";
+        std::cerr << "\n";
 
         if (masters == 1 && skipped) {
           std::remove("ff_insert.log");
