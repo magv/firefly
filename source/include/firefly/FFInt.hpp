@@ -43,94 +43,90 @@ namespace firefly {
      *    @param n_ an integer which is a member of the finite field
      */
     template<class T, typename=typename std::enable_if<(std::is_enum<T>::value || std::is_integral<T>::value)>::type>
-    FFInt(const T n_);
+    FFInt(const T n_) {
+      if (n_ >= 0) {
+        if (static_cast<uint64_t>(n_) < mod.n) {
+          n = static_cast<uint64_t>(n_);
+        } else {
+          n = static_cast<uint64_t>(n_)  % mod.n;
+        }
+      } else if (n_ < 0) {
+        n = mod.n - static_cast<uint64_t>(-n_) % mod.n;
+      }
+    }
     /**
      *    A constructor
      *    @param ffint a FFInt object
      */
-    FFInt(const FFInt& ffint);
+    FFInt(const FFInt& ffint) : n(ffint.n) {};
     /**
-     *  A constructer for a flint::fmpzxx object
+     *  A constructor for a flint::fmpzxx object
      *  @param in the flint::fmpzxx object which should be converted to an FFInt
      */
-    FFInt(const fmpzxx &in);
-    [[deprecated("Old and slow parser, which will be removed in the next release. Use the shunting-yard parser instead.")]]
-    FFInt(const std::string& str, const std::vector<std::pair<std::string, uint64_t>>& replacements);
+    FFInt(const fmpzxx &in) : n(fmpz_get_nmod(in._fmpz(), FFInt::mod)) {};
     /**
      *    Default constructor
      */
-    FFInt();
+    FFInt() : n(0) { };
+    /**
+     *  A direct constructor that bypasses the modulo operation.
+     *  @param n an integer, 0 <= n < mod.n
+     */
+    static inline FFInt from(const uint64_t n) { FFInt x; x.n = n; return x; }
     /**
      *  A static function to define a new prime field
      *  @param prime the defining prime of the field
      */
-    static void set_new_prime(uint64_t prime);
+    static inline void set_new_prime(uint64_t prime) {
+      nmod_init(&FFInt::mod, prime);
+      FFInt::p = mod.n;
+      FFInt::p_inv = mod.ninv;
+    }
     /**
      *  Converts the uint64_t to a negative integer (only used for negative exponents)
      */
-    int to_neg_int() const;
+    int to_neg_int() const { return -static_cast<int>(n); }
 
     // defining new operators for finite field arithmetic
-    FFInt& operator=(const FFInt&) = default;
-    FFInt& operator+=(const FFInt&);
-    FFInt& operator-=(const FFInt&);
-    FFInt& operator*=(const FFInt&);
-    FFInt& operator/=(const FFInt&);
-    FFInt operator-() const;
-    FFInt operator+() const;
-    FFInt operator++();
-    FFInt operator++(int);
-    FFInt operator--();
-    FFInt operator--(int);
-    bool operator!() const;
-    FFInt pow(const FFInt& ffint) const;
+    FFInt &operator=(const FFInt&) = default;
+    FFInt &operator+=(const FFInt &x) { n = _nmod_add(n, x.n, mod); return *this; }
+    FFInt &operator-=(const FFInt &x) { n = _nmod_sub(n, x.n, mod); return *this; };
+    FFInt &operator*=(const FFInt &x) { n = nmod_mul(n, x.n, mod); return *this; };
+    FFInt &operator/=(const FFInt &x) { n = nmod_mul(n, nmod_inv(x.n, mod), mod); return *this; };
+    FFInt operator-() const { return FFInt::from(nmod_neg(n, mod)); }
+    FFInt operator+() const { return *this; };
+    FFInt operator++() { n = _nmod_add(n, 1, mod); return *this; };
+    FFInt operator++(int) { FFInt tmp = *this; n = _nmod_add(n, 1, mod); return tmp; };
+    FFInt operator--() { n = _nmod_sub(n, 1, mod); return *this; };
+    FFInt operator--(int) { FFInt tmp = *this; n = _nmod_sub(n, 1, mod); return tmp; };
+    bool operator!() const { return !n; };
+    FFInt pow(const FFInt &ffint) const { return FFInt::from(nmod_pow_ui(n, ffint.n, mod)); }
     template<class T, typename=typename std::enable_if<(std::is_enum<T>::value || std::is_integral<T>::value)>::type>
-    FFInt pow(const T& power) const;
+    FFInt pow(const T &power) const {
+        return FFInt::from(n_powmod2_preinv(n, power, mod.n, mod.ninv));
+      }
+    FFInt invert() const { return FFInt::from(nmod_inv(n, mod)); };
 
     uint64_t n; /**< the integer member of the finite field */
     static uint64_t p; /**< the prime defining the finite field */
     static uint64_t p_inv; /**< the inverse of the defining prime needed for FFTs*/
-  private:
-    uint64_t parse_longint(const std::string& str) const;
+    static nmod_t mod;
   };
 
-  bool operator<(const FFInt& a, const FFInt& b);
-  bool operator<=(const FFInt& a, const FFInt& b);
-  bool operator>(const FFInt& a, const FFInt& b);
-  bool operator>=(const FFInt& a, const FFInt& b);
-  bool operator==(const FFInt& a, const FFInt& b);
-  bool operator!=(const FFInt& a, const FFInt& b);
-  FFInt operator/(const FFInt& a, const FFInt& b);
-  FFInt operator+(const FFInt& a, const FFInt& b);
-  FFInt operator-(const FFInt& a, const FFInt& b);
-  FFInt operator*(const FFInt& a, const FFInt& b);
-  FFInt pow(const FFInt& ffint, const FFInt& power);
+  inline bool operator<(const FFInt &a, const FFInt &b) { return a.n < b.n; };
+  inline bool operator<=(const FFInt &a, const FFInt &b) { return a.n <= b.n; };
+  inline bool operator>(const FFInt& a, const FFInt &b) { return a.n > b.n; };
+  inline bool operator>=(const FFInt &a, const FFInt &b) { return a.n >= b.n; };
+  inline bool operator==(const FFInt &a, const FFInt &b) { return a.n == b.n; };
+  inline bool operator!=(const FFInt &a, const FFInt &b) { return a.n != b.n; };
+  inline FFInt operator/(const FFInt &a, const FFInt &b) { return FFInt::from(nmod_mul(a.n, nmod_inv(b.n, FFInt::mod), FFInt::mod)); };
+  inline FFInt operator+(const FFInt &a, const FFInt &b) { return FFInt::from(_nmod_add(a.n, b.n, FFInt::mod)); };
+  inline FFInt operator-(const FFInt &a, const FFInt &b) { return FFInt::from(_nmod_sub(a.n, b.n, FFInt::mod)); };
+  inline FFInt operator*(const FFInt &a, const FFInt &b) { return FFInt::from(nmod_mul(a.n, b.n, FFInt::mod)); };
+  inline FFInt pow(const FFInt& ffint, const FFInt& power) { return ffint.pow(power); };
   template<class T, typename=typename std::enable_if<(std::is_enum<T>::value || std::is_integral<T>::value)>::type>
-  FFInt pow(const FFInt& ffint, const T& power);
-  std::ostream& operator<<(std::ostream& out, const FFInt& ffint);
-
-  template<class T, typename>
-  FFInt::FFInt(const T n_) {
-    if (n_ >= 0) {
-      if (static_cast<uint64_t>(n_) < p) {
-        n = static_cast<uint64_t>(n_);
-      } else {
-        n = static_cast<uint64_t>(n_)  % p;
-      }
-    } else if (n_ < 0) {
-      n = p - static_cast<uint64_t>(-n_) % p;
-    }
-  }
-
-  template<class T, typename>
-  FFInt FFInt::pow(const T& power) const {
-    return FFInt(n_powmod2_preinv(n, power, p, p_inv));
-  }
-
-  template<class T, typename>
-  FFInt pow(const FFInt& ffint, const T& power) {
-    return ffint.pow(power);
-  }
+  inline FFInt pow(const FFInt& ffint, const T& power) { return ffint.pow(power); };
+  inline std::ostream &operator<<(std::ostream& out, const FFInt &x) { out << x.n; return out; }
 
   extern "C" {
     void firefly_exists(void);

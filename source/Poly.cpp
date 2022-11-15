@@ -261,7 +261,7 @@ namespace firefly {
         std::mt19937_64 eng(rd());//TODO Mersenne-Twister is too slow. Replace with pcg32
         std::uniform_int_distribution<uint64_t> distr;
         FFInt Delta(distr(eng));
-        size_t s = ((FFInt(0).p - 1) / 2);
+        size_t s = ((FFInt::p - 1) / 2);
         std::vector<FFInt> master_vec {FFInt(1)};
         Poly master(master_vec);
         std::vector<FFInt>().swap(master_vec);
