@@ -21,8 +21,7 @@ Please refer to these papers when using FireFly:
 FireFly requires:
 * C++ compiler supporting C++14
 * [CMake](https://cmake.org/) >= 3.1
-* [FLINT](http://www.flintlib.org/) >= 2.5
-* [GMP](https://gmplib.org/) >= 6.1.2 (compiled with --enable-cxx)
+* [FLINT](http://www.flintlib.org/) >= 2.5 (and its dependencies: [MPFR](https://www.mpfr.org/) and [GMP](https://gmplib.org/))
 * [zlib](https://www.zlib.net/) >= 1.2.11
 * MPI >= 3 (optional, mpich recommended)
 
@@ -72,12 +71,6 @@ If FLINT is cannot be found in the default system directories, one has to add th
 
 where `FLINT_LIB_PATH` is the absolute path pointing to the shared library of FLINT.
 
-If the GMP version installed in the system directories does not match 6.1.2 or CMake does not find GMP, the paths for GMP can be set with the flags:
-```
--DGMP_INCLUDE_DIRS=$GMP_INC_PATH -DGMP_LIBRARIES=$GMP_LIB_PATH
-```
-where `GMP_INC_PATH` is the absolute path to the directory of where the include files can be found (`gmpxx.h` is required) and `GMP_LIB_PATH` is the absolute path to the GMP library.
-
 One can include the support of the `jemalloc` memory allocation library by adding the flag
 ```
 -DWITH_JEMALLOC=true
@@ -98,8 +91,6 @@ Below is a list of all build options for `FireFly`:
 
 * `-DWITH_JEMALLOC=true` (default: `false`): Employ jemalloc for malloc operations (highly recommended).
 * `-DWITH_MPI=true` (default: `false`): Enable MPI support.
-* `-DGMP_INCLUDE_DIRS=$GMP_INC_PATH` (default: not set): If GMP is not automatically found, one has to manually set the absolute path to its header files (`gmpxx.h` is required).
-* `-DGMP_LIBRARIES=$GMP_LIB_PATH` (default: not set): If GMP is not automatically found, one has to manually set the absolute path to the shared library.
 * `-DFLINT_INCLUDE_DIR=$FLINT_INC_PATH` (default: not set): If FLINT is not automatically found, one has to manually set the absolute path to its header files.
 * `-DFLINT_LIBRARY=$FLINT_LIB_PATH` (default: not set): If FLINT is not automatically found, one has to manually set the absolute path to the shared library.
 * `-DMPI_CXX_INCLUDE_PATH=$MPI_INC_PATH` (default: not set): If MPI is not automatically found, one has to manually set the absolute path to its header files.
@@ -107,7 +98,9 @@ Below is a list of all build options for `FireFly`:
 * `-DBUILD_BENCH=true` (default: `false`): Build the benchmark executables `benchmarks` and `benchmarks_no_bt`, which perform some of the benchmarks from Ref. [2].
   The functions as well as the source code can be found in the directory `benchmarks`.
   Both executables can simply be run without command line arguments.
-* `-DFIREFLY_EXECUTABLE=true` (default: `false`): Build and install the executable `firefly`, cf. [FireFly Executable (in Development)](#firefly-executable-in-development).
+* `-DENABLE_FIREFLY=true` (default: `false`): Build and install the executable `firefly`, cf. [FireFly Executable (in Development)](#firefly-executable-in-development).
+* `-DENABLE_FF_INSERT=true` (default: `true`): Build and install the executable `ff_insert`.
+* `-DENABLE_EXAMPLE=true` (default: `true`): Build the executable `example`.
 
 Important standard options of CMake are:
 

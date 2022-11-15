@@ -25,8 +25,8 @@ if(NOT WIN32)
 endif()
 
 find_package(Threads REQUIRED)
-find_package(GMP 6.1.2 REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(FLINT REQUIRED)
 
 # set the build type to release. If one needs debugging symbols, compile
 # with "-DCMAKE_BUILD_TYPE=Debug"
@@ -56,9 +56,9 @@ set(INCLUDE_PATH_SRC ${SOURCE_PATH}/include/firefly)
 # include headers
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")
 include_directories(${INCLUDE_PATH})
-include_directories(${GMP_INCLUDE_DIRS})
 include_directories(${ZLIB_INCLUDE_DIRS})
-set(PKG_INCLUDE -I${GMP_INCLUDE_DIRS} -I${ZLIB_INCLUDE_DIRS})
+include_directories(${FLINT_INCLUDE_DIRS})
+set(PKG_INCLUDE -I${FLINT_INCLUDE_DIRS} -I${ZLIB_INCLUDE_DIRS})
 
 set(MPI_FLAG "0")
 
@@ -69,13 +69,6 @@ set(ENABLE_FIREFLY FALSE CACHE BOOL "Build and install the 'firefly' executable"
 set(ENABLE_EXAMPLE TRUE CACHE BOOL "Build the 'example' executable")
 set(WITH_MPI FALSE CACHE BOOL "Build with MPI support")
 
-# Check for FLINT
-# if you want to use FLINT instead of our default implementation, call cmake with
-# cmake -DWITH_FLINT=true ..
-# set(WITH_FLINT false)
-find_package(FLINT REQUIRED)
-include_directories(${FLINT_INCLUDE_DIR})
-set(PKG_INCLUDE ${PKG_INCLUDE} -I${FLINT_INCLUDE_DIR})
 
 # Check for MPI
 if(${WITH_MPI})
@@ -136,7 +129,7 @@ if(${ENABLE_SHARED})
   set_target_properties(FireFly_shared PROPERTIES OUTPUT_NAME firefly)
 endif()
 
-set(LIBS ${FLINT_LIBRARY} ${GMP_LIBRARIES} ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+set(LIBS ${FLINT_LIBRARIES} ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 if(${WITH_MPI})
   #string(STRIP ${MPI_CXX_LINK_FLAGS} MPI_CXX_LINK_FLAGS)
