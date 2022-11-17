@@ -637,7 +637,7 @@ namespace firefly {
 	      v_2.emplace_back("/");
 	      partial_rpn[i].emplace_back(std::make_pair(j, v_2));
             } else if (precomp_tokens[i][j - 1].first == tokens::NUMBER && (precomp_tokens[i][j - 2].first == tokens::VARIABLE || precomp_tokens[i][j - 2].first == tokens::NEG_VARIABLE)) {
-              FFInt inverse = 1 / precomp_tokens[i][j - 1].second;
+              FFInt inverse = precomp_tokens[i][j - 1].second.invert();
 	      partial_rpn[i].back().second = {{"1", partial_rpn[i].back().second[0] , "/"}};
 
               precomp_tokens[i][j - 1].second = inverse;

@@ -473,9 +473,9 @@ namespace firefly {
             FFInt equalizer;
 
             if (normalize_to_den)
-              equalizer = FFInt(1) / denominator.coefs[denominator.min_deg()];
+              equalizer = denominator.coefs[denominator.min_deg()].invert();
             else
-              equalizer = FFInt(1) / numerator.coefs[numerator.min_deg()];
+              equalizer = numerator.coefs[numerator.min_deg()].invert();
 
             canonical.first = (numerator * equalizer).coefs;
             canonical.second = (denominator * equalizer).coefs;
@@ -854,7 +854,7 @@ namespace firefly {
                 is_singular_system = false;
 
               // normalize
-              FFInt equalizer = FFInt(1) / terminator;
+              FFInt equalizer = terminator.invert();
 
               if (equalizer == 0)
                 div_by_zero = true;
@@ -1168,7 +1168,7 @@ namespace firefly {
                   }
                 }
 
-                FFInt equalizer = FFInt(1) / terminator;
+                FFInt equalizer = terminator.invert();
 
                 for (const auto & el : g_ni) {
                   solved_num.coefs.erase(el.first);

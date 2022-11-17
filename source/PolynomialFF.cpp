@@ -185,7 +185,7 @@ namespace firefly {
 
   PolynomialFF operator/(const PolynomialFF& a, const FFInt& ffint) {
     ff_map new_coefs = a.coefs;
-    FFInt inv = 1 / ffint;
+    FFInt inv = ffint.invert();
 
     for (auto & el : new_coefs) {
       el.second *= inv;
@@ -208,7 +208,7 @@ namespace firefly {
   }
 
   PolynomialFF& PolynomialFF::operator/=(const FFInt& ffint) {
-    FFInt inv = 1 / ffint;
+    FFInt inv = ffint.invert();
 
     for (auto & el : coefs) {
       el.second *= inv;
@@ -378,7 +378,7 @@ namespace firefly {
         if (deg > 0) {
           ff_map tmp_pow_poly;
 
-          if (tmp_shift > 0) {
+          if (tmp_shift != 0) {
             std::vector<std::vector<uint32_t>> tmp_powers(deg + 1, std::vector<uint32_t> (n));
 
             for (uint32_t k = 0; k <= deg; ++k) {
