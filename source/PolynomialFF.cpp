@@ -278,7 +278,7 @@ namespace firefly {
     return false;
   }
 
-  std::vector<uint32_t> PolynomialFF::max_deg() {
+  const std::vector<uint32_t> &PolynomialFF::max_deg() {
     if (max_degree.empty()) {
       int tmp_max = 0;
       int tmp_min = 0;
@@ -307,7 +307,7 @@ namespace firefly {
     return max_degree;
   }
 
-  std::vector<uint32_t> PolynomialFF::min_deg() {
+  const std::vector<uint32_t> &PolynomialFF::min_deg() {
     max_deg();
     return min_degree;
   }

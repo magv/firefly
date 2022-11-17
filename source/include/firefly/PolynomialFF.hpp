@@ -83,11 +83,11 @@ namespace firefly {
     /**
      *  @return the minimal degree of the PolynomialFF
      */
-    std::vector<uint32_t> min_deg();
+    const std::vector<uint32_t> &min_deg();
     /**
      *  @return the maximal degree of the PolynomialFF
      */
-    std::vector<uint32_t> max_deg();
+    const std::vector<uint32_t> &max_deg();
     /**
      *  Calculates a new PolynomialFF if one shifts its variables
      *  @param shift the shift of each variable
