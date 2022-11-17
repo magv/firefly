@@ -417,7 +417,8 @@ namespace firefly {
   }
 
   FFInt PolynomialFF::bin_coef(uint32_t n, uint32_t k) const {
-    FFInt res = 1;
+    FFInt num = 1;
+    FFInt den = 1;
 
     // Since C(n, k) = C(n, n-k)
     if (k > n - k)
@@ -425,11 +426,11 @@ namespace firefly {
 
     // Calculate value of [n * (n-1) *---* (n-k+1)] / [k * (k-1) *----* 1]
     for (uint32_t i = 0; i < k; ++i) {
-      res *= (FFInt(n) - FFInt(i));
-      res /= (FFInt(i) + FFInt(1));
+      num *= (FFInt(n) - FFInt(i));
+      den *= (FFInt(i) + FFInt(1));
     }
 
-    return res;
+    return num/den;
   }
 
   void PolynomialFF::remove_zero_coefs() {
