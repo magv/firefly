@@ -854,10 +854,14 @@ namespace firefly {
                 is_singular_system = false;
 
               // normalize
-              FFInt equalizer = terminator.invert();
+              FFInt equalizer;
 
-              if (equalizer == 0)
+              if (terminator == 0) {
+                equalizer = 0;
                 div_by_zero = true;
+              } else {
+                equalizer = terminator.invert();
+              }
 
               numerator *= equalizer;
               denominator *= equalizer;
