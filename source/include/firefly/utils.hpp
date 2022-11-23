@@ -44,17 +44,6 @@ namespace firefly {
   std::pair<bool, RationalNumber> get_rational_coef(const fmpzxx& a, const fmpzxx& p);
 
   /**
-   *    Applies the rational reconstruction algorithm MQRR from
-   *    Maximal Quotient Rational Reconstruction: An Almost Optimal Algorithm for Rational Reconstruction
-   *    by M. Monagan
-   *    @param a a number over a finite field
-   *    @param p a prime number defining the finite field
-   *    @return a RationalNumber which has been reconstruction using the
-   *    rational reconstruction algorithm
-   */
-  std::pair<bool, RationalNumber> get_rational_coef_mqrr(const fmpzxx& a, const fmpzxx& p);
-
-  /**
   *  Solves the given modified Vandermonde system
   *  @param degs the contributing degrees
   *  @param nums the evaluated numerical values
