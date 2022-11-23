@@ -120,47 +120,6 @@ namespace firefly {
     }
   }
 
-  std::vector<std::vector<uint32_t>> generate_possible_shifts(uint32_t r) {
-    std::vector<std::vector<uint32_t>> result;
-    size_t size = 1;
-    size_t exp = r;
-    size_t base = 2;
-
-    while (exp) {
-      if (exp & 1)
-        size *= base;
-
-      exp >>= 1;
-
-      base *= base;
-    }
-
-    result.reserve(size - 1);
-    result.emplace_back(std::vector<uint32_t> (r));
-    std::vector<uint32_t> set = {0, 1};
-
-    for (uint32_t counter = 1; counter < size - 1; ++counter) {
-      std::vector<uint32_t> tuple(r);
-
-      uint32_t current_value = counter;
-
-      for (size_t i = 0; i < r; i++) {
-        uint32_t digit = current_value % 2;
-        tuple[r - i - 1] = set[digit];
-        current_value /= 2;
-      }
-
-      result.emplace_back(tuple);
-    }
-
-    std::sort(result.begin(), result.end(),
-    [](const std::vector<uint32_t>& a, const std::vector<uint32_t>& b) {
-      return a_grt_b_s(b, a);
-    });
-
-    return result;
-  }
-
   PolynomialFF solve_vandermonde_system(std::vector<std::vector<uint32_t>>& degs,
                                         const std::vector<FFInt>& nums,
   const std::vector<FFInt>& val) {

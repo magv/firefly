@@ -76,11 +76,6 @@ namespace firefly {
    */
   bool a_eq_b(const std::vector<uint32_t>& a, const std::vector<uint32_t>& b);
   /**
-   *  Generates a vector of possible tuples of 1 and 0 for a given length r
-   *  @param r the length of the vector
-   */
-  std::vector<std::vector<uint32_t>> generate_possible_shifts(uint32_t r);
-  /**
    *  Generates the next binary permutation
    *  @param curr_per current permutation
    *  @return a pair where the first bool indicates if the second entry is a new permutation
