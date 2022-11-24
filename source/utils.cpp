@@ -24,24 +24,15 @@
 
 namespace firefly {
   std::pair<fmpzxx, fmpzxx> run_chinese_remainder(
-    const std::pair<fmpzxx, fmpzxx>& p1,
-    const std::pair<fmpzxx, fmpzxx>& p2) {
-    fmpzxx a, n, m1, m2, tmp_c;
-    n = p1.second * p2.second;
-    tmp_c = flint::invmod(p2.second, p1.second);
-    //mpz_t tmp;
-    //mpz_init(tmp);
-    //mpz_invert(tmp, p2.second.get_mpz_t(), p1.second.get_mpz_t());
-    //tmp_c = fmpzxx(tmp);
-    m1 = tmp_c * p2.second;
-    m2 = (fmpzxx(1) - m1) % n;
-
-    if (m2 < 0) m2 = m2 + n;
-
-    a = (m1 * p1.first + m2 * p2.first) % n;
-
-    //mpz_clear(tmp);
-    return std::pair<fmpzxx, fmpzxx> (a, n);
+    const fmpzxx &a1, const fmpzxx &m1, ulong a2, ulong m2, ulong m2inv)
+  {
+    fmpzxx m1m2;
+    fmpz_mul_ui(m1m2._fmpz(), m1._fmpz(), m2);
+    ulong c = n_invmod(fmpz_fdiv_ui(m1._fmpz(), m2), m2);
+    if (c == 0) abort();
+    fmpzxx p1p2;
+    _fmpz_CRT_ui_precomp(p1p2._fmpz(), a1._fmpz(), m1._fmpz(), a2, m2, m2inv, 0, c, 0);
+    return std::pair<fmpzxx, fmpzxx>(p1p2, m1m2);
   }
 
   std::pair<bool, RationalNumber> get_rational_coef(const fmpzxx& a, const fmpzxx& p) {

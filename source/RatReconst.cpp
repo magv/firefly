@@ -1456,16 +1456,12 @@ namespace firefly {
         fmpzxx combined_prime_back = combined_prime;
         mpz_map combined_prime_ni_back = combined_primes_ni;
         mpz_map combined_prime_di_back = combined_primes_di;
-        std::pair<fmpzxx, fmpzxx> p1;
-        std::pair<fmpzxx, fmpzxx> p2;
         std::pair<fmpzxx, fmpzxx> p3;
 
         //numerator
         for (auto it = combined_ni.begin(); it != combined_ni.end(); ++it) {
           if (!is_safe_mode) {
-            p1 = std::make_pair(it->second, combined_prime);
-            p2 = std::make_pair(fmpzxx(numerator[it->first].n), fmpzxx(FFInt::p));
-            p3 = run_chinese_remainder(p1, p2);
+            p3 = run_chinese_remainder(it->second, combined_prime, numerator[it->first].n, FFInt::p, FFInt::p_inv);
             combined_ni[it->first] = p3.first;
           } else {
             if (numerator.find(it->first) != numerator.end() && g_ni.find(it->first) == g_ni.end()) {
@@ -1473,9 +1469,7 @@ namespace firefly {
                 combined_ni[it->first] = fmpzxx(numerator[it->first].n);
                 combined_primes_ni[it->first] = fmpzxx(FFInt::p);
               } else {
-                p1 = std::make_pair(it->second, combined_primes_ni[it->first]);
-                p2 = std::make_pair(fmpzxx(numerator[it->first].n), fmpzxx(FFInt::p));
-                p3 = run_chinese_remainder(p1, p2);
+                p3 = run_chinese_remainder(it->second, combined_primes_ni[it->first], numerator[it->first].n, FFInt::p, FFInt::p_inv);
                 combined_ni[it->first] = p3.first;
                 combined_primes_ni[it->first] = p3.second;
               }
@@ -1486,9 +1480,7 @@ namespace firefly {
         // denominator
         for (auto it = combined_di.begin(); it != combined_di.end(); ++it) {
           if (!is_safe_mode) {
-            p1 = std::make_pair(it->second, combined_prime);
-            p2 = std::make_pair(fmpzxx(denominator[it->first].n), fmpzxx(FFInt::p));
-            p3 = run_chinese_remainder(p1, p2);
+            p3 = run_chinese_remainder(it->second, combined_prime, denominator[it->first].n, FFInt::p, FFInt::p_inv);
             combined_di[it->first] = p3.first;
           } else {
             if (denominator.find(it->first) != denominator.end() && g_di.find(it->first) == g_di.end()) {
@@ -1496,9 +1488,7 @@ namespace firefly {
                 combined_di[it->first] = fmpzxx(denominator[it->first].n);
                 combined_primes_di[it->first] = fmpzxx(FFInt::p);
               } else {
-                p1 = std::make_pair(it->second, combined_primes_di[it->first]);
-                p2 = std::make_pair(fmpzxx(denominator[it->first].n), fmpzxx(FFInt::p));
-                p3 = run_chinese_remainder(p1, p2);
+                p3 = run_chinese_remainder(it->second, combined_primes_di[it->first], denominator[it->first].n, FFInt::p, FFInt::p_inv);
                 combined_di[it->first] = p3.first;
                 combined_primes_di[it->first] = p3.second;
               }

@@ -475,34 +475,27 @@ namespace firefly {
             tmp_pol_ff.insert(solved_degs.begin(), solved_degs.end());
 
             if (!with_rat_reconst) {
-              mpz_map ci_tmp = convert_to_mpz(tmp_pol_ff);
-
               if (!use_chinese_remainder) {
-                combined_ci = ci_tmp;
+                combined_ci = convert_to_mpz(tmp_pol_ff);
               } else {
                 // use another prime to utilize the Chinese Remainder Theorem to reconstruct the rational
                 // coefficients
 
-                std::pair<fmpzxx, fmpzxx> p1;
-                std::pair<fmpzxx, fmpzxx> p2;
                 std::pair<fmpzxx, fmpzxx> p3;
 
-                for (const auto & el : combined_ci) {
-                  if (ci_tmp.find(el.first) == ci_tmp.end() && gi.find(el.first) == gi.end()) {
-                    ci_tmp.emplace(std::make_pair(el.first, 0));
+                for (const auto & el : tmp_pol_ff) {
+                  if (tmp_pol_ff.find(el.first) == tmp_pol_ff.end() && gi.find(el.first) == gi.end()) {
+                    tmp_pol_ff.emplace(std::make_pair(el.first, FFInt(0)));
                   }
                 }
 
-                for (auto it = ci_tmp.begin(); it != ci_tmp.end(); ++it) {
-                  p2 = std::make_pair(fmpzxx(it->second), fmpzxx(FFInt::p));
-
-                  if (combined_ci.find(it->first) == combined_ci.end() && gi.find(it->first) == gi.end()) {
-                    combined_ci.emplace(std::make_pair(it->first, 0));
+                for (const auto & it : tmp_pol_ff) {
+                  if (combined_ci.find(it.first) == combined_ci.end() && gi.find(it.first) == gi.end()) {
+                    combined_ci.emplace(std::make_pair(it.first, fmpzxx(0)));
                   }
 
-                  p1 = std::make_pair(fmpzxx(combined_ci[it->first]), combined_prime);
-                  p3 = run_chinese_remainder(p1, p2);
-                  combined_ci[it->first] = p3.first;
+                  p3 = run_chinese_remainder(fmpzxx(combined_ci[it.first]), combined_prime, it.second.n, FFInt::p, FFInt::p_inv);
+                  combined_ci[it.first] = p3.first;
                 }
 
                 combined_prime = p3.second;

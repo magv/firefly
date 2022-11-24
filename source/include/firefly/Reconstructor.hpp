@@ -1959,21 +1959,11 @@ namespace firefly {
   fmpzxx Reconstructor<BlackBoxTemp>::combine_primes(const std::unordered_map<uint32_t, uint64_t>& poly,
                                                         std::unordered_map<uint32_t, fmpzxx>& combined_ci,
                                                         const fmpzxx& combined_prime) {
-    std::pair<fmpzxx, fmpzxx> p1;
-    std::pair<fmpzxx, fmpzxx> p2;
     std::pair<fmpzxx, fmpzxx> p3;
-    std::unordered_map<uint32_t, fmpzxx> tmp_coefs {};
 
-    // Convert poly to mpz
-    for (const auto& mon : poly) {
-      tmp_coefs.emplace(std::make_pair(mon.first, fmpzxx(mon.second)));
-    }
-
-    for (auto it = tmp_coefs.begin(); it != tmp_coefs.end(); ++it) {
-      p2 = std::make_pair(it->second, fmpzxx(FFInt::p));
-      p1 = std::make_pair(combined_ci[it->first], combined_prime);
-      p3 = run_chinese_remainder(p1, p2);
-      combined_ci[it->first] = p3.first;
+    for (const auto &it : poly) {
+      p3 = run_chinese_remainder(combined_ci[it.first], combined_prime, it.second, FFInt::p, FFInt::p_inv);
+      combined_ci[it.first] = p3.first;
     }
 
     return p3.second;

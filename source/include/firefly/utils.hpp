@@ -25,15 +25,16 @@
 namespace firefly {
   /**
    *    Applies the cinese remainder theorem
-   *    @param p1 a pair of a coefficient a and a prime p
-   *    @param p2 a pair of a coefficient a and a prime p
-   *    @returns the combination of p1 and p2 corresponding to the chinese
+   *    @param a1 the first coefficient
+   *    @param m1 the first modulus
+   *    @param a2 the second coefficient
+   *    @param m2 the second modulus
+   *    @param m2inv n_preinvert_limb(m2)
+   *    @returns the combination of a1 and a2 corresponding to the chinese
    *    remainder theorem
    */
   std::pair<fmpzxx, fmpzxx> run_chinese_remainder(
-    const std::pair<fmpzxx, fmpzxx>& p1,
-    const std::pair<fmpzxx, fmpzxx>& p2);
-
+    const fmpzxx &a1, const fmpzxx &m1, ulong a2, ulong m2, ulong m2inv);
   /**
    *    Applies the rational reconstruction algorithm
    *    @param a a number over a finite field
