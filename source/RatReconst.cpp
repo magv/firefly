@@ -1534,9 +1534,9 @@ namespace firefly {
             bool curr_monagan;
 
             if (!is_safe_mode)
-              res = get_rational_coef(c_ni.second, combined_prime_back);
+              res = get_rational_coef_mqrr(c_ni.second, combined_prime_back);
             else
-              res = get_rational_coef(c_ni.second, combined_prime_ni_back[c_ni.first]);
+              res = get_rational_coef_mqrr(c_ni.second, combined_prime_ni_back[c_ni.first]);
 
             last_monagan = res.first;
 
@@ -1544,9 +1544,9 @@ namespace firefly {
               last_rn_monagan = res.second;
 
             if (!is_safe_mode)
-              res = get_rational_coef(combined_ni[c_ni.first], combined_prime);
+              res = get_rational_coef_mqrr(combined_ni[c_ni.first], combined_prime);
             else
-              res = get_rational_coef(combined_ni[c_ni.first], combined_primes_ni[c_ni.first]);
+              res = get_rational_coef_mqrr(combined_ni[c_ni.first], combined_primes_ni[c_ni.first]);
 
             curr_monagan = res.first;
 
@@ -1614,9 +1614,9 @@ namespace firefly {
             bool curr_monagan;
 
             if (!is_safe_mode)
-              res = get_rational_coef(c_di.second, combined_prime_back);
+              res = get_rational_coef_mqrr(c_di.second, combined_prime_back);
             else
-              res = get_rational_coef(c_di.second, combined_prime_di_back[c_di.first]);
+              res = get_rational_coef_mqrr(c_di.second, combined_prime_di_back[c_di.first]);
 
             last_monagan = res.first;
 
@@ -1624,9 +1624,9 @@ namespace firefly {
               last_rn_monagan = res.second;
 
             if (!is_safe_mode)
-              res = get_rational_coef(combined_di[c_di.first], combined_prime);
+              res = get_rational_coef_mqrr(combined_di[c_di.first], combined_prime);
             else
-              res = get_rational_coef(combined_di[c_di.first], combined_primes_di[c_di.first]);
+              res = get_rational_coef_mqrr(combined_di[c_di.first], combined_primes_di[c_di.first]);
 
             curr_monagan = res.first;
 
@@ -1947,7 +1947,7 @@ namespace firefly {
         g_ni[ci.first] = res.second;
         promoted_n.emplace_back(&ci.first);
       } else {
-        res = get_rational_coef(a, combined_prime);
+        res = get_rational_coef_mqrr(a, combined_prime);
 
         if (res.first) {
           g_ni[ci.first] = res.second;
@@ -1968,7 +1968,7 @@ namespace firefly {
           g_di[ci.first] = res.second;
           promoted_d.emplace_back(&ci.first);
         } else {
-          res = get_rational_coef(a, combined_prime);
+          res = get_rational_coef_mqrr(a, combined_prime);
 
           if (res.first) {
             g_di[ci.first] = res.second;

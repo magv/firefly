@@ -41,6 +41,62 @@ namespace firefly {
     return std::make_pair(ok, rn);
   }
 
+  /* Implementation of MQRR from
+   * Maximal Quotient Rational Reconstruction: An Almost Optimal Algorithm for Rational Reconstruction
+   * by M. Monagan
+   */
+  std::pair<bool, RationalNumber> get_rational_coef_mqrr(const fmpzxx& u, const fmpzxx& p) {
+    RationalNumber rn;
+    // set to T so that less than one percent will be false positive results
+    fmpzxx T = fmpzxx(1024 * p.sizeinbase(2));
+    bool ok = true;
+
+    if (u == 0) {
+      if (p > T)
+        return std::make_pair(ok, RationalNumber(0, 1));
+      else
+        return std::make_pair(false, RationalNumber(0, 1));
+    }
+
+    fmpzxx n = fmpzxx(0);
+    fmpzxx d = fmpzxx(0);
+    fmpzxx t0 = fmpzxx(0);
+    fmpzxx r0 = p;
+    fmpzxx t1 = fmpzxx(1);
+    fmpzxx r1 = u;
+    fmpzxx tmpr;
+    fmpzxx tmpt;
+    fmpzxx q;
+
+    while ((!r1.is_zero()) && r0 > T) {
+      q = r0 / r1; // fmpzxx automatically rounds off
+
+      if (q > T) {
+        n = r1;
+        d = t1;
+        T = q;
+      }
+
+      tmpr = r0;
+      r0 = r1;
+      r1 = tmpr - q * r1;
+      tmpt = t0;
+      t0 = t1;
+      t1 = tmpt - q * t1;
+    }
+
+    if (d.is_zero() || gcd(n, d) != 1) {
+      ok = false;
+      n = 1;
+      d = 1;
+    }
+
+    if (d < 0)
+      return std::make_pair(ok, RationalNumber((-n).evaluate(), abs(d).evaluate()));
+
+    return std::make_pair(ok, RationalNumber(n, d));
+  }
+
   bool a_grt_b(const std::vector<uint32_t>& a, const std::vector<uint32_t>& b) {
     for (int i = a.size() - 1; i != -1; --i) {
       if (a[i] == b[i])
