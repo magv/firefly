@@ -21,6 +21,9 @@
 #include "firefly/config.hpp"
 
 #include <flint/ulong_extras.h>
+#include <flint/nmod.h>
+#include <flint/nmod_poly.h>
+#include <flint/fmpq_vec.h>
 #include <flint/fmpzxx.h>
 #include <flint/fmpqxx.h>
 #include <iostream>

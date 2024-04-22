@@ -25,6 +25,7 @@
 #include "firefly/RationalFunctionFF.hpp"
 
 #include <flint/nmod_poly.h>
+#include <flint/nmod_poly_factor.h>
 
 #include <map>
 
